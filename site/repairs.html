@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Repairs & prices — Dhanmondi Mobile Care</title>
+<meta name="theme-color" content="#F7F9FD">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23275FCE'/%3E%3Cpath d='M12 10h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2Z' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=40"><link rel="stylesheet" href="pages.css?v=41"><link rel="stylesheet" href="lower.css?v=54">
+<link rel="stylesheet" href="nx.css?v=53">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap">
+</head>
+<body data-page="repairs">
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="nav"></header>
+<main id="main">
+<section class="page-hero"><div class="ph-mesh" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap ph-in"><nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span data-icon="right" data-size="14"></span><span aria-current="page">Repairs & prices</span></nav>
+    <div class="ph-row ph2"><div class="ph2-copy"><p class="eyebrow">Repair store</p><h1>Repairs for your <em data-dev-name>iPhone 13</em></h1><p class="ph-sub">Parts and labour included, checked free before any work. Pick your phone and every price on this page updates.</p></div>
+      <div class="ph2-dev"><div class="ph2-dh"><span class="ph2-ic" data-icon="phoneDev"></span><div><b>Showing prices for</b><small>Change it any time — nothing is booked yet</small></div></div><div id="catDev"></div><p class="ph2-note"><span data-icon="check"></span><span><b data-svc-count>9</b> repairs priced for this phone</span></p></div></div>
+    <ul class="ph-trust"><li><span data-icon="diag"></span>Free check first</li><li><span data-icon="wallet"></span>Pay after the repair</li><li><span data-icon="shield"></span><span>Up to <span data-cfg="maxWarranty"></span> warranty</span></li><li><span data-icon="truck"></span><span>Courier pickup <span data-cfg="pickup"></span></span></li></ul></div></section>
+<section class="store plp"><div class="wrap plp-in">
+  <aside class="plp-side" aria-label="Filters">
+    <div class="ps-box"><h2 class="ps-h">Categories</h2><div class="cat-list" id="catTabs" role="tablist" aria-label="Categories" aria-orientation="vertical"></div></div>
+    <div class="ps-box"><h2 class="ps-h">Price</h2><div class="pr-chips" id="fPrice" role="radiogroup" aria-label="Price"></div></div>
+    <div class="ps-box"><h2 class="ps-h">Repair time</h2><label class="chk"><input type="checkbox" id="fSame"><span>Same day only</span></label></div>
+    <div class="ps-box"><h2 class="ps-h">Availability</h2><label class="chk"><input type="checkbox" id="fStock"><span>Part in stock now</span></label></div>
+    <div class="ps-box"><h2 class="ps-h">Customer rating</h2><div class="rate-list" id="fRate" role="radiogroup" aria-label="Minimum rating"></div></div>
+    <button type="button" class="ps-clear" id="fClear" hidden>Clear all filters</button>
+  </aside>
+  <div class="plp-main">
+    <div class="store-bar">
+      <div class="sb-row sb2">
+        <div class="search-in"><span data-icon="search"></span><label for="pSearch" class="sr">Search repairs</label><input id="pSearch" type="search" placeholder="Search repairs, e.g. cracked, charging…" autocomplete="off"></div>
+        <div class="store-tools">
+          <div class="sel sm"><label for="sortBy" class="sr">Sort</label><select id="sortBy"><option value="popular">Most booked</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="fast">Fastest</option></select><span data-icon="down"></span></div>
+          <div class="view-seg" role="radiogroup" aria-label="View"><button type="button" role="radio" data-view="grid" aria-checked="true" aria-label="Cards"><span data-icon="grid"></span></button><button type="button" role="radio" data-view="board" aria-checked="false" aria-label="Price board"><span data-icon="list"></span></button></div>
+          <button type="button" class="s-btn sm plp-ftog" id="fOpen" aria-controls="plpSide" aria-expanded="false"><span data-icon="filter"></span>Filters</button>
+        </div>
+      </div>
+      <div class="sb-meta"><p class="p-count" id="pCount" aria-live="polite"></p><div class="f-chips" id="fChips"></div></div>
+    </div>
+    <p class="shop-note" id="shopNote" hidden><span data-icon="info"></span>Add-ons are reserved from our shelf and handed over with your repaired phone. Stock is live.</p>
+    <div class="p-grid" id="pGrid"></div>
+  </div>
+</div></section>
+
+<section class="nx nx-guides plp-tips">
+  <div class="wrap">
+    <div class="nx-split"><div><p class="nx-k">Repair tips</p><h2>Quick reads <em>before you book.</em></h2></div><p class="nx-side">From our technicians. Each ends with the right repair for your phone.</p></div>
+    <div class="ar-grid" id="tipGrid"></div>
+  </div>
+</section>
+
+<section class="nx price-rules">
+  <div class="wrap">
+    <header class="rq-h"><p class="rq-k">How our prices work</p><p class="rq-score">Same rules at the counter, on the phone and online</p></header>
+    <div class="prl">
+      <div class="prl-intro"><h2>The price you see<br><em>is the price you pay.</em></h2>
+        <div class="prl-help"><b>Not on the list, or not sure?</b><p>Describe the problem — the assistant picks the repair and books it, or call a technician.</p><div><button class="s-btn primary sm" type="button" data-ai-open><span data-icon="chat"></span>Ask the assistant</button><a class="s-btn sm" href="#" data-cfg-tel><span data-icon="phone"></span><span data-cfg="phone"></span></a></div></div>
+      </div>
+      <ol class="prl-list">
+        <li><span class="pr-n">01</span><div><h3>Parts and labour in one price</h3><p>Every price is for your exact model and includes the part, fitting, testing and the warranty.</p></div><b class="prl-f">All-in</b></li>
+        <li><span class="pr-n">02</span><div><h3>Two part choices where it matters</h3><p>Premium compatible is priced at <span data-cfg="compatPct"></span> of original, with the same warranty. Original (OEM) where the manufacturer sells it.</p></div><b class="prl-f" data-cfg="compatPct"></b></li>
+        <li><span class="pr-n">03</span><div><h3>Nothing extra without your OK</h3><p>If the check finds more, you get a quote to approve or decline on your tracking page. Decline and you pay nothing.</p></div><b class="prl-f">৳0</b></li>
+        <li><span class="pr-n">04</span><div><h3>Pickup is the only add-on fee</h3><p>Courier pickup and return across the city, paid when your phone comes back.</p></div><b class="prl-f" data-cfg="pickup"></b></li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot" id="foot"></footer>
+<script src="../js/icons.js?v=9"></script><script src="site-icons.js?v=2"></script><script src="../js/core.js?v=9"></script><script src="../js/ui.js?v=9"></script><script src="../js/domain.js?v=9"></script><script src="../js/shopcfg.js?v=3"></script><script src="../js/auth.js?v=9"></script>
+<script src="bridge.js?v=70"></script><script src="assistant.js?v=60"></script><script src="shop.js?v=90"></script><script src="account.js?v=91"></script><script src="guides.js?v=1"></script><script src="layout.js?v=80"></script>
+<script>boot(() => Shop.initCatalog());</script>
+</body>
+</html>
