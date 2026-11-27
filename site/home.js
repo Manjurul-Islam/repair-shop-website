@@ -70,7 +70,7 @@ function initVisit() {
     <ul class="vx-hours">${SHOP.hours.map(([d, t]) => `<li><span>${esc(d)}</span><b>${esc(t)}</b></li>`).join('')}</ul>
     <div class="vx-a"><a class="s-btn primary sm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.addr)}" target="_blank" rel="noopener">${ic('mapPin', 16)}Directions</a><a class="s-btn sm" href="${telHref(b.phone)}">${ic('phone', 16)}${esc(b.phone)}</a></div></div></article>`).join('')
     + `<article class="vx-card vx-pick"><div class="vx-pk-in"><span class="vx-pk-ic" data-duo="truck"></span><p class="nx-k light">Can’t come in?</p><h3>We’ll collect it from your door.</h3><p>Courier pickup and return across the city. Your phone travels sealed, and you pay when it comes back.</p>
-      <dl><div><dt>Pickup fee</dt><dd>${fmtBDT(PICKUP_FEE)}</dd></div><div><dt>Earliest slot</dt><dd>${(s => s ? s.label + ' ' + s.times[0] : '—')(slotDays(1)[0])}</dd></div></dl>
+      <dl><div><dt>Pickup fee</dt><dd>${fmtBDT(PICKUP_FEE)}</dd></div><div><dt>Earliest slot</dt><dd>${(s => s ? s.label + ' ' + s.times[0] : 'Call us')(slotDays(1)[0])}</dd></div></dl>
       <button class="s-btn light" type="button" data-ai-open data-ai-say="I need a pickup">${ic('truck', 18)}Book a pickup</button></div></article>`;
 }
 function mapArt(n) {
@@ -90,7 +90,7 @@ function initLoops() {
     $('.bk-p.p1 small').textContent = rg(sc); $('.bk-p.p2 small').textContent = rg(sb); $$('.bk-art').forEach(el => el.innerHTML = art(el.dataset.art));
     loop(bs, 4, 1500, i => { bs.dataset.s = i; $('#bkCount').textContent = i > 1 ? '2' : '1'; if (i === 2) { const c = $('.bks-cart'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); } $('#bkTotal').textContent = fmtBDT(svcPrice(sc, d, 'compatible') + (i > 1 ? svcPrice(sb, d, 'compatible') : 0)); }); }
   const bc = $('.bk-chat'); if (bc) loop(bc, 4, 2100, i => { bc.dataset.s = i; });
-  const ap = $('.aph'); if (ap) loop(ap, 4, 2200, i => { const st = ['Booked', 'Checked — quote sent', 'Repair in progress', 'Ready for pickup'][i]; $('#apTitle').textContent = st; $$('.aph-steps li', ap).forEach((li, n) => li.className = n < i ? 'd' : n === i ? 'c' : ''); ap.dataset.s = i; });
+  const ap = $('.aph'); if (ap) loop(ap, 4, 2200, i => { const st = ['Booked', 'Checked, quote sent', 'Repair in progress', 'Ready for pickup'][i]; $('#apTitle').textContent = st; $$('.aph-steps li', ap).forEach((li, n) => li.className = n < i ? 'd' : n === i ? 'c' : ''); ap.dataset.s = i; });
 }
 
 
@@ -104,7 +104,7 @@ function loadVoices() {
 function initVoices() {
   const wall = $('#voiceWall'); if (!wall) return; const sum = ratingOf(null);
   const vs = $('#vwStars'); if (vs) { vs.innerHTML = `<i>★★★★★</i><b style="width:${sum.avg / 5 * 100}%">★★★★★</b>`; vs.setAttribute('aria-label', `${sum.avg.toFixed(1)} out of 5`); }
-  const vn = $('#visitNow'); if (vn) vn.textContent = 'Walk in any time during opening hours — booking just holds your slot and a technician ready for you.';
+  const vn = $('#visitNow'); if (vn) vn.textContent = 'Walk in any time we’re open. Booking ahead holds a slot and a technician for you.';
   const svcName = ids => (ids || []).map(id => (svcById(id) || {}).name).filter(Boolean)[0] || 'Repair';
   const list = (DB.feedback || []).filter(f => !f.hidden && f.text).slice(0, 16);
   if (list.length < 2) { wall.closest('section').hidden = true; return; }

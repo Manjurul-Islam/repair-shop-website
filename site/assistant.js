@@ -69,13 +69,13 @@ const AI = {
     if (s.mode === 'track-code') { if (e.code || /\d{3,5}/.test(text)) { s.track.code = e.code || text.match(/\d{3,5}/)[0]; return this.trackStep(); } }
     if (s.mode === 'track-phone') { const d = text.replace(/\D/g, ''); if (d.length >= 4) { s.track.last4 = d.slice(-4); return this.trackStep(); } }
     if (s.done && intent === 'book' && !e.device && !e.service) { return this.say('Your booking ' + s.done + ' is confirmed. Want to track it, or book another device?', { chips: [['Track ' + s.done, 'track ' + s.done], ['Book another device', 'start over']] }); }
-    if (intent === 'reset') { this.st = this.fresh(); return this.say('No problem — let’s start fresh. Which phone needs fixing?', { chips: this.modelChips() }); }
+    if (intent === 'reset') { this.st = this.fresh(); return this.say('Sure, let’s start again. Which phone needs fixing?', { chips: this.modelChips() }); }
     if (intent === 'track') { s.mode = 'track'; s.track = { code: e.code || null }; return this.trackStep(); }
     if (intent === 'hours') return this.say(`We’re open ${SHOP.hours.map(h => h[0] + ' ' + h[1]).join(', and ')}. Both branches keep the same hours.`, { chips: this.resumeChips() });
-    if (intent === 'where') return this.say(SHOP.branches.map(b => `<b>${b.name}</b> — ${b.addr}. ${b.near}.`).join('<br>'), { chips: this.resumeChips() });
+    if (intent === 'where') return this.say(SHOP.branches.map(b => `<b>${b.name}</b>: ${b.addr}. ${b.near}.`).join('<br>'), { chips: this.resumeChips() });
     if (intent === 'warranty') return this.say('Every repair comes with a written warranty: ' + SERVICES.filter(x => x.warranty).map(x => `${x.warranty} days on ${x.name.toLowerCase()}`).join(', ') + '. If the same fault returns, we fix it free.', { chips: this.resumeChips() });
-    if (intent === 'safety') return this.say('Your data stays yours. We don’t need your passcode for most repairs — if a test needs it, we ask first and you can enter it yourself. Devices are sealed in a tagged bag while they’re with us.', { chips: this.resumeChips() });
-    if (intent === 'human') return this.say(`Of course. Call <a href="tel:${SHOP.branches[0].phone.replace(/-/g, '')}">${SHOP.branches[0].phone}</a> and a technician will pick up, or keep chatting here — I’ll pass everything we’ve covered to them.`, { chips: this.resumeChips() });
+    if (intent === 'safety') return this.say('Your data stays yours. Most repairs don’t need your passcode. If a test does, we ask first and you type it in yourself. Devices are sealed in a tagged bag while they’re with us.', { chips: this.resumeChips() });
+    if (intent === 'human') return this.say(`Of course. Call <a href="tel:${SHOP.branches[0].phone.replace(/-/g, '')}">${SHOP.branches[0].phone}</a> and a technician will pick up, or keep chatting here and I’ll pass this conversation to them.`, { chips: this.resumeChips() });
     if (intent === 'hello' && !s.device && !s.service) return this.say('Hi! I can book a repair, give you a price, or check on a device you’ve already dropped off. What’s going on with your phone?', { chips: [['Cracked screen', 'my screen is cracked'], ['Battery drains fast', 'battery drains fast'], ['Track a repair', 'track my repair']] });
     this.apply(e);
     return this.next();
@@ -83,19 +83,19 @@ const AI = {
   next() {
     const s = this.st; const dev = s.device, svc = s.service && svcById(s.service);
     if (!dev) { s.mode = 'model';
-      if (s.brand) return this.say(`Which ${s.brand} model is it?`, { chips: MODELS.filter(m => m.brand === s.brand).map(m => [m.model, m.model]).concat([['Not listed — I’ll type it', null]]) });
+      if (s.brand) return this.say(`Which ${s.brand} model is it?`, { chips: MODELS.filter(m => m.brand === s.brand).map(m => [m.model, m.model]).concat([['Not listed? Type it', null]]) });
       return this.say(svc ? `I can help with that. Which phone is it?` : 'Happy to help. Which phone is it?', { chips: this.modelChips() }); }
-    if (!svc) { s.mode = 'service'; return this.say(`Got it — ${dev.brand === 'Other' ? '' : ''}${dev.model}. What’s going on with it?`, { chips: SERVICES.filter(x => x.id !== 'diag').slice(0, 6).map(x => [x.name.replace(' replacement', '').replace(' repair', ''), x.name.toLowerCase()]).concat([['Not sure', 'not sure what is wrong']]) }); }
+    if (!svc) { s.mode = 'service'; return this.say(`Got it, ${dev.model}. What’s wrong with it?`, { chips: SERVICES.filter(x => x.id !== 'diag').slice(0, 6).map(x => [x.name.replace(' replacement', '').replace(' repair', ''), x.name.toLowerCase()]).concat([['Not sure', 'not sure what is wrong']]) }); }
     if (!s.quoted) { s.quoted = true; s.mode = 'handoff';
-      return this.say(svc.id === 'diag' ? `No problem — we’ll run a <b>free check</b> on your ${dev.model} and tell you the exact fix and price before doing anything.` : `Here’s what it usually costs for your ${dev.model}. You’ll get the final price after a free check — no work starts until you approve it.`, { card: 'quote' }).then(() => this.next()); }
+      return this.say(svc.id === 'diag' ? `No problem. We’ll run a <b>free check</b> on your ${dev.model} and tell you the exact fix and price before doing anything.` : `Here’s what it usually costs for your ${dev.model}. We confirm the final price after a free check, and we only start once you approve it.`, { card: 'quote' }).then(() => this.next()); }
     if (!s.handoff) { s.mode = 'handoff'; return this.say('How would you like to get it to us?', { chips: this.handoffChips() }); }
     if (s.handoff === 'dropoff' && !s.branch) { s.mode = 'branch'; return this.say('Which branch is easier for you?', { chips: SHOP.branches.map(b => [b.name, 'drop at ' + b.name.toLowerCase()]) }); }
     if (s.handoff === 'pickup' && !s.address) { s.mode = 'address'; return this.say(`Where should our courier collect it? Pickup inside Dhaka is ${fmtBDT(PICKUP_FEE)}, and the device travels in a sealed, tagged bag.`, { placeholder: 'House, road, area' }); }
     if (!s.slot) { s.mode = 'slot'; return this.say(s.handoff === 'pickup' ? 'When should we come by?' : 'When will you drop it off?', { card: 'slots' }); }
     const me0 = typeof Acc !== 'undefined' && Acc.me(); if (me0 && !s.name && !s.phone) { s.name = me0.name; s.phone = me0.phone; }
-    if (!s.name || !/^01[3-9]\d{8}$/.test(s.phone)) { s.mode = 'contact'; return this.say('Last thing — who should we send updates to? We’ll text your tracking code to this number.', { card: 'contact' }); }
+    if (!s.name || !/^01[3-9]\d{8}$/.test(s.phone)) { s.mode = 'contact'; return this.say('Last step. Who should we send updates to? We’ll text your tracking code to this number.', { card: 'contact' }); }
     s.mode = 'confirm';
-    return this.say('Here’s your booking. Check it over — nothing is booked until you confirm.', { card: 'summary' });
+    return this.say('Here’s your booking. Check the details. Nothing is booked until you confirm.', { card: 'summary' });
   },
   trackStep() {
     const s = this.st, t = s.track;
@@ -109,7 +109,7 @@ const AI = {
     const s = this.st; if (s.done) return;
     const me1 = typeof Acc !== 'undefined' && Acc.me(); const r = Bridge.book({ accountId: me1 ? me1.id : null, source: 'assistant', device: s.device, service: s.service, details: s.details, urgent: s.urgent, handoff: s.handoff, branch: s.handoff === 'pickup' ? SHOP.branches[0].id : s.branch, address: s.address, slot: s.slot, name: s.name, phone: s.phone });
     s.done = r.code; s.mode = null; this.persist();
-    this.say(`You’re booked. Your repair code is <b>${r.code}</b> — we’ve noted it against ${esc(s.phone)}.`, { card: 'done', data: r, chips: [['Track ' + r.code, 'track ' + r.code], ['Book another device', 'start over']] });
+    this.say(`You’re booked. Your repair code is <b>${r.code}</b>, linked to ${esc(s.phone)}.`, { card: 'done', data: r, chips: [['Track ' + r.code, 'track ' + r.code], ['Book another device', 'start over']] });
     document.dispatchEvent(new CustomEvent('site:booked', { detail: r }));
   },
 
@@ -143,7 +143,7 @@ const AI = {
     if (m.card === 'summary') { const svc = svcById(s.service), p = fromPrice(svc, s.device), br = SHOP.branches.find(b => b.id === s.branch);
       const rows = [['Device', esc(s.device.model), 'device'], ['Repair', svc.name, 'service'], ['Estimate', (svc.id === 'diag' ? 'Free check' : 'from ' + fmtBDT(p)) + (s.handoff === 'pickup' ? ` + ${fmtBDT(PICKUP_FEE)} pickup` : ''), null], [s.handoff === 'pickup' ? 'Pickup' : 'Drop-off', s.handoff === 'pickup' ? esc(s.address) : br.name + ' branch', 'handoff'], ['When', fmtSlot(s.slot), 'slot'], ['Updates to', esc(s.name) + ' · ' + esc(s.phone), 'contact']];
       return `<div class="ai-card summary"><dl>${rows.map(([k, v, f]) => `<div><dt>${k}</dt><dd>${v}</dd>${f && last ? `<button type="button" class="edit" data-edit="${f}" aria-label="Change ${k.toLowerCase()}">Change</button>` : ''}</div>`).join('')}</dl>${last ? `<div class="sum-f"><button class="s-btn primary block" type="button" data-confirm>${ic('check', 18)}Confirm booking</button><p>${ic('secure', 14)}No payment now. You approve the final price before work starts.</p></div>` : ''}</div>`; }
-    if (m.card === 'done') { return `<div class="ai-card done"><div class="done-code"><small>Repair code</small><b>${esc(m.data.code)}</b></div><ul><li>${ic('okCircle', 16)}Saved to the shop’s repair queue</li><li>${ic('okCircle', 16)}${s.handoff === 'pickup' ? 'Our courier will call before arriving' : 'Bring the device — no passcode needed'}</li><li>${ic('okCircle', 16)}Track anytime with the code and your number</li></ul><button type="button" class="s-btn sm" data-ics="${esc(m.data.code)}">${ic('calendar', 16)}Add to calendar</button></div>`; }
+    if (m.card === 'done') { return `<div class="ai-card done"><div class="done-code"><small>Repair code</small><b>${esc(m.data.code)}</b></div><ul><li>${ic('okCircle', 16)}Saved to the shop’s repair queue</li><li>${ic('okCircle', 16)}${s.handoff === 'pickup' ? 'Our courier will call before arriving' : 'Bring the phone. No passcode needed'}</li><li>${ic('okCircle', 16)}Track anytime with the code and your number</li></ul><button type="button" class="s-btn sm" data-ics="${esc(m.data.code)}">${ic('calendar', 16)}Add to calendar</button></div>`; }
     if (m.card === 'track') return trackCard(m.data, true);
     return '';
   },
@@ -161,7 +161,7 @@ const AI = {
     if (!this.el) this.mount();
     document.body.classList.add('ai-open'); this.el.hidden = false; requestAnimationFrame(() => this.el.classList.add('on'));
     this.lastFocus = document.activeElement;
-    if (!this.log.length) { this.st = this.fresh(); if (!prefill) this.say('Hi, I’m the Dhanmondi Mobile Care assistant. Tell me what happened to your phone — in your own words — and I’ll get you a price and a time. Nothing is booked until you confirm.', { chips: [['My screen is cracked', 'my screen is cracked'], ['Battery dies fast', 'battery drains fast'], ['Track a repair', 'track my repair'], ['Not sure what’s wrong', 'not sure what is wrong']] }); }
+    if (!this.log.length) { this.st = this.fresh(); if (!prefill) this.say('Hi, I’m the Dhanmondi Mobile Care assistant. Tell me what happened to your phone in your own words, and I’ll find you a price and a time. Nothing is booked until you confirm.', { chips: [['My screen is cracked', 'my screen is cracked'], ['Battery dies fast', 'battery drains fast'], ['Track a repair', 'track my repair'], ['Not sure what’s wrong', 'not sure what is wrong']] }); }
     if (prefill) setTimeout(() => this.hear(prefill), 60); else setTimeout(() => this.el.querySelector('#aiInput').focus({ preventScroll: true }), 220);
   },
   close() {
@@ -210,7 +210,7 @@ const AI = {
 
 function downloadIcs(code, s) {
   if (!s || !s.slot) return; const [h] = s.slot.time.split(':'); const d = s.slot.date.replace(/-/g, '');
-  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dhanmondi Mobile Care//EN', 'BEGIN:VEVENT', 'UID:' + code + '@dhanmondimobile.care', `DTSTART:${d}T${h}0000`, `DTEND:${d}T${pad(+h + 1)}0000`, `SUMMARY:${s.handoff === 'pickup' ? 'Courier pickup' : 'Drop off phone'} — ${code}`, `LOCATION:${s.handoff === 'pickup' ? s.address : (SHOP.branches.find(b => b.id === s.branch) || SHOP.branches[0]).addr}`, 'DESCRIPTION:Repair ' + code + ' (' + s.device.model + ')', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dhanmondi Mobile Care//EN', 'BEGIN:VEVENT', 'UID:' + code + '@dhanmondimobile.care', `DTSTART:${d}T${h}0000`, `DTEND:${d}T${pad(+h + 1)}0000`, `SUMMARY:${s.handoff === 'pickup' ? 'Courier pickup' : 'Drop off phone'}: ${code}`, `LOCATION:${s.handoff === 'pickup' ? s.address : (SHOP.branches.find(b => b.id === s.branch) || SHOP.branches[0]).addr}`, 'DESCRIPTION:Repair ' + code + ' (' + s.device.model + ')', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   downloadFile(code + '.ics', ics, 'text/calendar');
 }
 
@@ -219,8 +219,8 @@ function trackCard(r, compact) {
   const j = r.job, cur = stageIndex(j.status), t = r.totals, declined = j.status === 'cancelled' && j.quote && j.quote.state === 'declined';
   const copy = declined ? ['You declined the quote', 'No charge. Collect your phone any time during opening hours.'] : STATUS_COPY[j.status];
   const q = j.quote, fb = (DB.feedback || []).find(f => f.jobId === j.id);
-  const qBox = j.status === 'quote' && q && q.state === 'pending' ? `<div class="trk-q" role="group" aria-label="Approve your quote"><div class="tq-h"><small>Quote for ${esc(j.brand)} ${esc(j.model)}</small><b>${fmtBDT(q.amount)}</b>${j.online && j.estimate && q.amount > j.estimate ? `<em>Booked at ${fmtBDT(j.estimate)}</em>` : ''}</div>${q.note ? `<p>${esc(q.note)}</p>` : ''}<div class="tq-a"><button class="s-btn primary" type="button" data-quote="yes" data-code="${esc(j.code)}">${ic('check', 18)}Approve ${fmtBDT(q.amount)}</button><button class="s-btn" type="button" data-quote="no" data-code="${esc(j.code)}">Decline</button></div><small class="tq-f">Declining is free — we return your phone as it was.</small></div>` : '';
-  const rvBox = j.status !== 'delivered' || compact ? '' : fb ? `<div class="trk-rv done">${ic('star', 16)}<span>You rated this repair <b>${fb.rating}/5</b>${fb.text ? ` — “${esc(fb.text)}”` : ''}. Thank you.</span></div>` : `<form class="trk-rv" data-review="${esc(j.code)}" novalidate><b>How did we do?</b><div class="rv-stars" role="radiogroup" aria-label="Your rating">${[1, 2, 3, 4, 5].map(n => `<label><input type="radio" name="rating" value="${n}" aria-label="${n} star${n > 1 ? 's' : ''}"><span aria-hidden="true">★</span></label>`).join('')}</div><textarea name="text" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="rv-a"><small>Shown on our website with your first name.</small><button class="s-btn primary sm" type="submit">Send review</button></div><p class="rv-e" role="alert"></p></form>`;
+  const qBox = j.status === 'quote' && q && q.state === 'pending' ? `<div class="trk-q" role="group" aria-label="Approve your quote"><div class="tq-h"><small>Quote for ${esc(j.brand)} ${esc(j.model)}</small><b>${fmtBDT(q.amount)}</b>${j.online && j.estimate && q.amount > j.estimate ? `<em>Booked at ${fmtBDT(j.estimate)}</em>` : ''}</div>${q.note ? `<p>${esc(q.note)}</p>` : ''}<div class="tq-a"><button class="s-btn primary" type="button" data-quote="yes" data-code="${esc(j.code)}">${ic('check', 18)}Approve ${fmtBDT(q.amount)}</button><button class="s-btn" type="button" data-quote="no" data-code="${esc(j.code)}">Decline</button></div><small class="tq-f">Declining is free. We return your phone as it was.</small></div>` : '';
+  const rvBox = j.status !== 'delivered' || compact ? '' : fb ? `<div class="trk-rv done">${ic('star', 16)}<span>You rated this repair <b>${fb.rating}/5</b>${fb.text ? `: “${esc(fb.text)}”` : ''}. Thank you.</span></div>` : `<form class="trk-rv" data-review="${esc(j.code)}" novalidate><b>How did we do?</b><div class="rv-stars" role="radiogroup" aria-label="Your rating">${[1, 2, 3, 4, 5].map(n => `<label><input type="radio" name="rating" value="${n}" aria-label="${n} star${n > 1 ? 's' : ''}"><span aria-hidden="true">★</span></label>`).join('')}</div><textarea name="text" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="rv-a"><small>Shown on our website with your first name.</small><button class="s-btn primary sm" type="submit">Send review</button></div><p class="rv-e" role="alert"></p></form>`;
   const steps = STAGES.map(([k, l], n) => `<li class="${n < cur ? 'done' : n === cur ? 'cur' : ''}"><i>${n < cur ? ic('check', 12) : ''}</i><span>${l}</span></li>`).join('');
   const tl = [...j.timeline].reverse().slice(0, compact ? 3 : 6).map(x => `<li><b>${esc(x.text.replace(/^Status: .* → /, 'Now: '))}</b><small>${fmtTs(x.ts)}</small></li>`).join('');
   return `<div class="trk ${compact ? 'compact' : ''}" data-trk="${esc(j.code)}" data-compact="${compact ? 1 : ''}"><div class="trk-h"><div><small>${esc(j.code)} · ${esc(j.brand)} ${esc(j.model)}</small><h3>${copy[0]}</h3><p>${copy[1]}</p></div>${j.status === 'cancelled' ? '' : `<span class="trk-st ${j.status === 'ready' || j.status === 'delivered' ? 'ok' : j.status === 'quote' ? 'warn' : ''}">${j.status === 'waiting_parts' ? 'Waiting for part' : j.status === 'quote' ? 'Needs your OK' : STAGES[cur][1]}</span>`}</div>${qBox}

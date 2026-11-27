@@ -61,8 +61,8 @@ const WEB_DEFAULTS = { pickupFee: 150, compatPct: 68, since: '', week: WEEK_DEFA
 const DEMO_SHOP = 'Dhanmondi Mobile Care';
 /* Website copy the owner edits in Settings → Website. The public site reads these live. */
 const CONTENT_DEFAULTS = {
-  announce: 'Book your repair in a single message', h1a: 'Phone repairs,', h1b: 'handled with care.',
-  lede: 'Tell us what happened. Get an honest price, a time that suits you, and updates until your phone is back in your hand.',
+  announce: 'Book your repair in one message', h1a: 'Phone repairs,', h1b: 'handled with care.',
+  lede: 'Tell us what’s wrong. You’ll see the price for your phone, pick a time that suits you and get updates until it’s back in your hand.',
   socials: { facebook: 'https://facebook.com', instagram: 'https://instagram.com', youtube: 'https://youtube.com', whatsapp: true },
   show: { reviews: true, guides: true, faq: true, track: true }
 };
@@ -86,6 +86,8 @@ function ensureShopConfig(db) {
   if (!Array.isArray(S.services)) { S.services = JSON.parse(JSON.stringify(SVC_DEFAULTS)); ch = true; }
   if (!S.web) { S.web = JSON.parse(JSON.stringify(WEB_DEFAULTS)); if (S.shop === DEMO_SHOP) S.web.since = '2016'; ch = true; }
   if (!S.web.content) { S.web.content = JSON.parse(JSON.stringify(CONTENT_DEFAULTS)); ch = true; }
+  const RVFIX = {'Chose the compatible screen to save money — honestly can’t tell the difference.': 'Went with the compatible screen to save money. I can’t tell the difference.', 'They cleaned the port first and it worked — no part needed.': 'They cleaned the port first and it worked. No part needed.', 'Stuck on the logo for days — fixed without losing my data.': 'It was stuck on the logo for days. Fixed, and I didn’t lose any data.'}; (db.feedback || []).forEach(f => { if (RVFIX[f.text]) { f.text = RVFIX[f.text]; ch = true; } });
+  const WC = S.web.content; if (/^Tell us what happened\. Get an honest price/.test(WC.lede || '')) { WC.lede = CONTENT_DEFAULTS.lede; ch = true; } if (WC.announce === 'Book your repair in a single message') { WC.announce = CONTENT_DEFAULTS.announce; ch = true; }
   if (!S.branchInfo) { S.branchInfo = {}; ch = true; }
   S.branches.forEach(b => { if (!S.branchInfo[b]) { S.branchInfo[b] = { ...(S.shop === DEMO_SHOP && DEMO_BRANCHES[b] || { label: b, addr: S.address || '', phone: S.phone || '', near: '' }) }; ch = true; } });
   if (!db.counters) db.counters = {};
@@ -146,14 +148,14 @@ function seedFeedback(db) {
   const prev = DB, prevU = typeof USER !== 'undefined' ? USER : null; DB = db; USER = null;
   const R = rng(20261122), pick = a => a[Math.floor(R() * a.length)];
   const T = {
-    screen: ['Colours look exactly like before and Face ID still works.', 'Done in under two hours, price was what the website said.', 'Chose the compatible screen to save money — honestly can’t tell the difference.'],
+    screen: ['Colours look exactly like before and Face ID still works.', 'Done in under two hours, price was what the website said.', 'Went with the compatible screen to save money. I can’t tell the difference.'],
     battery: ['Waited 45 minutes with a cup of tea. Battery health back to 100%.', 'They printed the battery health on the invoice. Nice touch.', 'Phone lasts the whole day again.'],
-    port: ['They cleaned the port first and it worked — no part needed.', 'Charging fast again, fair price.'],
+    port: ['They cleaned the port first and it worked. No part needed.', 'Charging fast again, fair price.'],
     back: ['Back glass looks factory new and the frame has no scratches.'],
     camera: ['Photos are sharp again, they tested it with me at the counter.'],
     speaker: ['Calls are loud and clear now. Quick job.'],
     water: ['Dropped it in the rain. Got my photos back and the phone works.', 'They were honest about the chances and it worked out.'],
-    software: ['Stuck on the logo for days — fixed without losing my data.'],
+    software: ['It was stuck on the logo for days. Fixed, and I didn’t lose any data.'],
     _: ['Clear price, written warranty, and I could check the status instead of calling.', 'They told me the real problem before replacing anything.', 'Straightforward people. Would come back.', 'Booked online, dropped it off, collected the same evening.']
   };
   db.jobs.filter(j => j.status === 'delivered' && !j.isWarranty && j.deliveredAt).sort((a, b) => a.deliveredAt.localeCompare(b.deliveredAt)).forEach(j => {

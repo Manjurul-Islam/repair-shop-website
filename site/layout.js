@@ -18,7 +18,7 @@ function renderChrome() {
         <a role="menuitem" href="account.html#overview">${ic('grid', 16)}Overview</a><a role="menuitem" href="account.html#bookings">${ic('wrench', 16)}My bookings</a><a role="menuitem" href="account.html#devices">${ic('phoneDev', 16)}Devices</a><a role="menuitem" href="account.html#profile">${ic('user', 16)}Profile</a><button role="menuitem" type="button" data-signout>${ic('logout', 16)}Sign out</button></div></div>`
     : `<a class="n-sign" href="signin.html?next=${encodeURIComponent(location.pathname.split('/').pop() + location.search + location.hash)}">${ic('user', 18)}<span>Sign in</span></a>`;
   const header = `<div class="wrap nav-in">
-    <a href="index.html" class="brand" aria-label="Dhanmondi Mobile Care — home">${LOGO(30)}<span>Dhanmondi <em>Mobile Care</em></span></a>
+    <a href="index.html" class="brand" aria-label="Dhanmondi Mobile Care home">${LOGO(30)}<span>Dhanmondi <em>Mobile Care</em></span></a>
     <nav class="nav-links" aria-label="Main"><a href="repairs.html" ${['repairs', 'repair'].includes(PAGE) ? 'aria-current="page" class="on"' : ''}>Repairs & prices</a><a href="${H('#how')}" data-sec="how">How it works</a><a href="${H('#track')}" data-sec="track">Track a repair</a><a href="${H('#visit')}" data-sec="visit">Visit us</a></nav>
     <div class="nav-r"><button class="cart-b" type="button" data-open-cart aria-label="Your booking">${ic('cart', 20)}<b data-cart-count hidden>0</b></button>${acct}
       <a class="s-btn light sm nav-cta" href="${H('#book')}">Book a repair</a>
@@ -35,7 +35,7 @@ function renderChrome() {
         <div><h4>Visit</h4>${SHOP.branches.map(b => `<a href="${H('#visit')}">${esc(b.name)}</a>`).join('')}${SHOP.email ? `<a href="mailto:${esc(SHOP.email)}">${esc(SHOP.email)}</a>` : ''}</div>
         <div><h4>Hours</h4>${SHOP.hours.map(h => `<span>${esc(h[0])}<br><b>${esc(h[1])}</b></span>`).join('')}</div></nav></div>
     <div class="ft-pay"><span>We accept</span><ul class="ps-list sm"><li class="pl-cash">Cash</li><li class="pl-bk">bKash</li><li class="pl-ng">Nagad</li><li class="pl-visa">VISA</li><li class="pl-mc"><i></i><i></i>Mastercard</li><li class="pl-amex">AMEX</li></ul></div>
-    <div class="ft-bot"><span>© ${new Date().getFullYear()} ${esc(SHOP.name)}</span><span>Runs on <b>Benchly</b> · Demo site — data stays in this browser</span></div></div>
+    <div class="ft-bot"><span>© ${new Date().getFullYear()} ${esc(SHOP.name)}</span><span>Runs on <b>Benchly</b> · Demo site. Data stays in this browser</span></div></div>
     <div class="ft-mark" aria-hidden="true">${esc(SHOP.name.split(' ').slice(-2).join(' '))}</div>`;
   if (!$('.fab')) document.body.insertAdjacentHTML('beforeend', `<button class="fab" type="button" data-ai-open aria-label="Open repair assistant">${ic('chat', 20)}<span>Ask the assistant</span></button>`);
   if (!$('#toast')) document.body.insertAdjacentHTML('beforeend', `<div class="toast" id="toast" role="status" aria-live="polite"></div>`);
@@ -84,7 +84,7 @@ async function boot(init) {
   renderChrome(); paintIcons(); Shop.load(); Shop.badge(); initNav(); Shop.wire();
   document.addEventListener('click', e => { const b = e.target.closest('[data-ai-open]'); if (b && !b.closest('#ai')) { e.preventDefault(); AI.open(b.dataset.aiSay || ''); }
     if (e.target.closest('[data-signout]')) { Acc.signOut(); say(`${ic('okCircle', 18)}<span>Signed out</span>`); setTimeout(() => { location.href = PAGE === 'account' ? 'index.html' : location.href.split('#')[0]; }, 400); } });
-  document.addEventListener('site:booked', e => say(`${ic('okCircle', 18)}<span>Booked — your code is <b>${e.detail.code}</b></span>`));
+  document.addEventListener('site:booked', e => say(`${ic('okCircle', 18)}<span>Booked. Your code is <b>${e.detail.code}</b></span>`));
   paintCfg(); wireJobActions();
   addEventListener('storage', e => { if (e.key === 'qf:ws:' + Bridge.ws && e.newValue) { Bridge.reload(); paintCfg(); } });
   init && await init();
@@ -95,7 +95,7 @@ async function boot(init) {
 function cfgValue(k) {
   const st = Bridge.stats(), [lo, hi] = priceRange(), br = SHOP.branches, today = hoursToday();
   return ({ phone: SHOP.phone, maxWarranty: maxWarranty() + '-day', maxWarrantyN: String(maxWarranty()), pickup: fmtBDT(PICKUP_FEE), priceLo: fmtBDT(lo), priceHi: fmtBDT(hi),
-    rating: st.reviews ? st.rating.toFixed(1) : '—', reviews: st.reviews.toLocaleString('en-US'), delivered: st.delivered.toLocaleString('en-US'), sameDay: st.sameDay + '%',
+    rating: st.reviews ? st.rating.toFixed(1) : 'New', reviews: st.reviews.toLocaleString('en-US'), delivered: st.delivered.toLocaleString('en-US'), sameDay: st.sameDay + '%',
     lastTag: '#' + ((DB.jobs[DB.jobs.length - 1] || {}).tag || 'A-0001'), branch2: (br[1] || br[0]).name, close: today ? today.to : SHOP.hours[0] ? SHOP.hours[0][1].split(' – ')[1] : '',
     hours: SHOP.hours.map(h => h[0] + ' ' + h[1]).join(' · '), callHours: (() => { const w = SHOP.week.filter(Boolean); return w.length ? w.map(h => h[0]).sort()[0] + ' and ' + w.map(h => h[1]).sort().pop() : ''; })(), shop: SHOP.name, compatPct: DB.settings.web.compatPct + '%' })[k];
 }
@@ -109,11 +109,11 @@ function wireJobActions() {
   document.addEventListener('click', e => { const b = e.target.closest('[data-quote]'); if (!b) return; const yes = b.dataset.quote === 'yes', code = b.dataset.code;
     if (!yes && !confirm('Decline this quote? You pay nothing and collect your phone as it is.')) return;
     const er = Bridge.answer(code, yes); if (er) return say(`${ic('info', 18)}<span>${esc(er)}</span>`);
-    say(`${ic('okCircle', 18)}<span>${yes ? `Approved — your technician starts on <b>${esc(code)}</b> now` : 'Quote declined — no charge'}</span>`); redraw(code); });
+    say(`${ic('okCircle', 18)}<span>${yes ? `Approved. Your technician starts on <b>${esc(code)}</b> now` : 'Quote declined. No charge'}</span>`); redraw(code); });
   document.addEventListener('submit', e => { const f = e.target.closest('[data-review]'); if (!f) return; e.preventDefault(); const r = (f.querySelector('[name=rating]:checked') || {}).value;
     if (!r) { f.querySelector('.rv-e').textContent = 'Choose 1 to 5 stars.'; return; }
     const er = Bridge.review(f.dataset.review, +r, f.text.value); if (er) { f.querySelector('.rv-e').textContent = er; return; }
-    say(`${ic('okCircle', 18)}<span>Thanks — your review is live</span>`); redraw(f.dataset.review); });
+    say(`${ic('okCircle', 18)}<span>Thanks, your review is live</span>`); redraw(f.dataset.review); });
 }
 
 /* duotone rendering of Hugeicons stroke icons: a 22% tinted fill layer behind the stroke */

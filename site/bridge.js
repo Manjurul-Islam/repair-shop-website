@@ -89,11 +89,11 @@ const Bridge = {
     const fee = b.handoff === 'pickup' ? PICKUP_FEE : 0;
     const labour = sum(lines, l => l.price) + fee;
     const days = Math.max(1, ...lines.map(l => +l.svc.days || 1));
-    const j = createJob({ custId: c.id, brand: dev.brand, model: dev.model, issue: lines.map(l => l.label).join(' + ') + (b.details ? ' — ' + b.details : ''), priority: b.urgent ? 'high' : 'normal', branch: b.branch || SHOP.branches[0].id, date: todayS(), due: addDays(b.slot.date, days), estimate: labour, svcIds: items.map(i => i.id), grade: (items.find(i => GRADED.includes(i.id) && i.q !== 'tbd') || {}).q || '' });
+    const j = createJob({ custId: c.id, brand: dev.brand, model: dev.model, issue: lines.map(l => l.label).join(' + ') + (b.details ? ': ' + b.details : ''), priority: b.urgent ? 'high' : 'normal', branch: b.branch || SHOP.branches[0].id, date: todayS(), due: addDays(b.slot.date, days), estimate: labour, svcIds: items.map(i => i.id), grade: (items.find(i => GRADED.includes(i.id) && i.q !== 'tbd') || {}).q || '' });
     j.online = { accountId: b.accountId || null, source: b.source, handoff: b.handoff, slot: b.slot, address: b.address || '', pay: b.pay || 'Pay at collection', items, addons: b.addons || [], bookedAt: Date.now() };
     const br = SHOP.branches.find(x => x.id === j.branch) || SHOP.branches[0];
-    j.notes = `Booked online via ${b.source === 'assistant' ? 'the repair assistant' : 'the website checkout'}. ${b.handoff === 'pickup' ? `Courier pickup (${fmtBDT(fee)}) from ` + b.address : 'Customer drop-off at ' + br.name} — ${fmtSlot(b.slot)}.${b.pay ? ' Payment: ' + b.pay + '.' : ''}${b.note ? ' Customer note: ' + b.note : ''}`;
-    j.timeline[0].text = `Booked online (${b.source === 'assistant' ? 'assistant' : 'checkout'}) — ${b.handoff === 'pickup' ? 'pickup' : 'drop-off'} ${fmtSlot(b.slot)}`;
+    j.notes = `Booked online via ${b.source === 'assistant' ? 'the repair assistant' : 'the website checkout'}. ${b.handoff === 'pickup' ? `Courier pickup (${fmtBDT(fee)}) from ` + b.address : 'Customer drop-off at ' + br.name}, ${fmtSlot(b.slot)}.${b.pay ? ' Payment: ' + b.pay + '.' : ''}${b.note ? ' Customer note: ' + b.note : ''}`;
+    j.timeline[0].text = `Booked online (${b.source === 'assistant' ? 'assistant' : 'checkout'}): ${b.handoff === 'pickup' ? 'pickup' : 'drop-off'} ${fmtSlot(b.slot)}`;
     const failed = [];
     (b.addons || []).forEach(a => { const it = itemOf(a.itemId); const er = it ? addJobPart(j, it, a.qty) : 'missing'; if (er) failed.push(it ? it.name : a.itemId); });
     saveNow();

@@ -1,7 +1,7 @@
 'use strict';
 /* Customer accounts (separate from Benchly staff users).
    Accounts are linked to the shop's customer records by mobile number, so every
-   repair booked with that number — online or at the counter — shows up here. */
+   repair booked with that number, online or at the counter, shows up here. */
 const digits10 = p => String(p || '').replace(/\D/g, '').slice(-10);
 const validPhone = p => /^01[3-9]\d{8}$/.test(String(p).replace(/[\s-]/g, '').replace(/^\+?88/, ''));
 const normPhone = p => String(p).replace(/[\s-]/g, '').replace(/^\+?88/, '');
@@ -68,8 +68,8 @@ const SignIn = {
       <label class="check"><input type="checkbox" name="remember" checked><span>Keep me signed in</span></label>
       <div class="form-e" role="alert"></div><button class="s-btn primary block lg" type="submit">Sign in</button></form>
       <div class="or"><span>or</span></div><button class="s-btn block lg" type="button" id="demoAcc">${ic('zap', 18)}Explore with a demo account</button>
-      <p class="au-alt">New here? <a class="lnk" href="#signup">Create an account</a> — or <a class="lnk" href="repairs.html">book as a guest</a>.</p>`;
-    if (mode === 'signup') h = `<div class="au-h"><h1>Create your account</h1><p>Use the mobile number you give at the counter — we’ll link your past repairs automatically.</p></div>
+      <p class="au-alt">New here? <a class="lnk" href="#signup">Create an account</a> or <a class="lnk" href="repairs.html">book as a guest</a>.</p>`;
+    if (mode === 'signup') h = `<div class="au-h"><h1>Create your account</h1><p>Use the mobile number you give at the counter, and we’ll link your past repairs automatically.</p></div>
       <form id="af" novalidate><div class="f"><label for="aName">Full name</label><input id="aName" name="name" autocomplete="name" placeholder="Sadia Islam"><p class="f-e"></p></div>
       <div class="f-2"><div class="f"><label for="aPhone">Mobile number</label><input id="aPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01XXXXXXXXX"><p class="f-e"></p></div><div class="f"><label for="aEmail">Email</label><input id="aEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com"><p class="f-e"></p></div></div>
       ${pwInput('aPw', 'pw', 'Password', 'new-password')}${pwRulesHtml('aRules')}
@@ -79,21 +79,21 @@ const SignIn = {
       <form id="af" novalidate><div class="f"><label for="aId">Email or mobile number</label><input id="aId" name="id" autocomplete="username"><p class="f-e"></p></div><div class="form-e" role="alert"></div><button class="s-btn primary block lg" type="submit">Send code</button></form>`;
     if (mode === 'reset') { const r = JSON.parse(sessionStorage.getItem('site:reset') || 'null') || {};
       h = `<a class="back" href="#forgot">${ic('left', 16)}Use a different email or number</a><div class="au-h"><h1>Enter your code</h1><p>We sent a 6-digit code to <b>${esc(r.to || 'your account')}</b>.</p></div>
-      <div class="demo-code">${ic('mail', 16)}<span>Demo mode — no SMS service is connected. Your code is <b>${esc(r.code || '')}</b></span></div>
+      <div class="demo-code">${ic('mail', 16)}<span>Demo mode: no SMS is sent. Your code is <b>${esc(r.code || '')}</b></span></div>
       <form id="af" novalidate><div class="f"><label for="aCode">6-digit code</label><input id="aCode" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000"><p class="f-e"></p></div>${pwInput('aPw', 'pw', 'New password', 'new-password')}${pwRulesHtml('aRules')}<div class="form-e" role="alert"></div><button class="s-btn primary block lg" type="submit">Update password</button></form>`; }
     box.innerHTML = h; box.dataset.mode = mode;
     const f = $('#af'); bindForm(f); const rl = $('#aRules'); rl && bindPwRules($('#aPw'), rl);
     const first = f.querySelector('input'); first && first.focus({ preventScroll: true });
     const busy = on => { const b = f.querySelector('[type=submit]'); b.disabled = on; b.classList.toggle('loading', on); };
     if (mode === 'signin') {
-      $('#demoAcc').onclick = async () => { const a = Acc.all().find(x => x.demo); if (!a) return formE(f, 'The demo account is still being prepared — try again in a moment.'); Acc.start(a); location.href = this.next(); };
+      $('#demoAcc').onclick = async () => { const a = Acc.all().find(x => x.demo); if (!a) return formE(f, 'The demo account is still loading. Try again in a moment.'); Acc.start(a); location.href = this.next(); };
       f.onsubmit = async e => { e.preventDefault(); const id = f.id.value.trim(), pw = f.pw.value; let bad = null;
         if (!id) bad = bad || fErr(f, 'id', 'Enter your email or mobile number'); if (!pw) bad = bad || fErr(f, 'pw', 'Enter your password'); if (bad) return bad.focus();
         busy(true); await new Promise(r => setTimeout(r, 300)); const r = await Acc.signIn(id, pw); busy(false); if (r.error) return formE(f, r.error);
         Acc.start(r.a, f.remember.checked); location.href = this.next(); }; }
     if (mode === 'signup') f.onsubmit = async e => { e.preventDefault(); const v = { name: f.name.value.trim(), phone: normPhone(f.phone.value), email: f.email.value.trim().toLowerCase(), pw: f.pw.value }; let bad = null;
       if (v.name.length < 2) bad = bad || fErr(f, 'name', 'Enter your name'); if (!validPhone(v.phone)) bad = bad || fErr(f, 'phone', 'Enter an 11-digit mobile number'); if (!validEmail(v.email)) bad = bad || fErr(f, 'email', 'Enter a valid email'); if (!pwOk(v.pw)) bad = bad || fErr(f, 'pw', 'Use 8+ characters with a letter and a number'); if (bad) return bad.focus();
-      if (Acc.find(v.email)) return fErr(f, 'email', 'An account already uses this email — sign in instead').focus(); if (Acc.find(v.phone)) return fErr(f, 'phone', 'An account already uses this number — sign in instead').focus();
+      if (Acc.find(v.email)) return fErr(f, 'email', 'This email already has an account. Sign in instead.').focus(); if (Acc.find(v.phone)) return fErr(f, 'phone', 'This number already has an account. Sign in instead.').focus();
       busy(true); const a = await Acc.create({ name: v.name, email: v.email, phone: v.phone, password: v.pw }); Acc.start(a); const n = Acc.bookings(a).length;
       sessionStorage.setItem('site:welcome', n ? `Welcome! We found ${n} repair${n > 1 ? 's' : ''} linked to your number.` : 'Welcome! Your account is ready.'); location.href = this.next(); };
     if (mode === 'forgot') f.onsubmit = e => { e.preventDefault(); const id = f.id.value.trim(); if (!id) return fErr(f, 'id', 'Enter your email or mobile number').focus(); const a = Acc.find(id);
@@ -101,7 +101,7 @@ const SignIn = {
     if (mode === 'reset') f.onsubmit = async e => { e.preventDefault(); const r = JSON.parse(sessionStorage.getItem('site:reset') || 'null'); let bad = null;
       if (!/^\d{6}$/.test(f.code.value.trim())) bad = bad || fErr(f, 'code', 'Enter the 6-digit code'); if (!pwOk(f.pw.value)) bad = bad || fErr(f, 'pw', 'Use 8+ characters with a letter and a number'); if (bad) return bad.focus();
       if (!r || Date.now() > r.exp) return formE(f, 'This code has expired. Request a new one.'); if (f.code.value.trim() !== r.code || !r.id) return fErr(f, 'code', 'That code isn’t right').focus();
-      const a = Acc.all().find(x => x.id === r.id); a.salt = uid('s'); a.hash = await hashPw(f.pw.value, a.salt); a.failed = 0; a.lockUntil = 0; Acc.update(a); sessionStorage.removeItem('site:reset'); Acc.start(a); sessionStorage.setItem('site:welcome', 'Password updated — you’re signed in.'); location.href = this.next(); };
+      const a = Acc.all().find(x => x.id === r.id); a.salt = uid('s'); a.hash = await hashPw(f.pw.value, a.salt); a.failed = 0; a.lockUntil = 0; Acc.update(a); sessionStorage.removeItem('site:reset'); Acc.start(a); sessionStorage.setItem('site:welcome', 'Password updated. You’re signed in.'); location.href = this.next(); };
   }
 };
 
@@ -125,12 +125,12 @@ const Account = {
     if (focus) { const h = m.querySelector('h1'); h.tabIndex = -1; h.focus({ preventScroll: true }); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); }
     const pw = m.querySelector('#nPw'); pw && bindPwRules(pw, $('#nRules')); $$('form', m).forEach(bindForm);
   },
-  jobRow(j) { const t = jobTotals(j); return `<a class="bk-row" href="#booking=${j.code}"><span class="br-art">${art(svcArt(j.issue))}</span><div class="br-t"><b>${esc(j.issue.split(' — ')[0])}</b><small>${esc(j.code)} · ${esc(j.model)} · ${j.online && j.online.slot ? fmtSlot(j.online.slot) : fmtDate(j.createdAt)}</small></div>${stPill(j)}<span class="br-p">${t.total ? fmtBDT(t.total) : 'Quote pending'}</span>${ic('right', 18)}</a>`; },
+  jobRow(j) { const t = jobTotals(j); return `<a class="bk-row" href="#booking=${j.code}"><span class="br-art">${art(svcArt(j.issue))}</span><div class="br-t"><b>${esc(j.issue.split(/ [—:] /)[0])}</b><small>${esc(j.code)} · ${esc(j.model)} · ${j.online && j.online.slot ? fmtSlot(j.online.slot) : fmtDate(j.createdAt)}</small></div>${stPill(j)}<span class="br-p">${t.total ? fmtBDT(t.total) : 'Quote pending'}</span>${ic('right', 18)}</a>`; },
   overview() {
     const me = this.me, all = Acc.bookings(me), act = all.filter(j => !['delivered', 'cancelled'].includes(j.status)), done = all.filter(j => j.status === 'delivered');
     const dev = (me.devices.find(d => d.primary) || me.devices[0]); const hr = new Date().getHours();
-    return `<header class="acc-h"><div><p class="eyebrow">${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}</p><h1>${esc(me.name.split(' ')[0])}, here’s your repair desk</h1></div><a class="s-btn primary" href="repairs.html">${ic('plus', 18)}Book a repair</a></header>
-      <div class="acc-stats"><div><small>Active repairs</small><b>${act.length}</b></div><div><small>Completed</small><b>${done.length}</b></div><div><small>Under warranty</small><b>${done.filter(j => DB.warranties.some(w => w.jobId === j.id && warStatus(w) !== 'expired' && !w.voided)).length}</b></div><div><small>Saved device</small><b class="sm">${dev ? esc(dev.model) : '—'}</b></div></div>
+    return `<header class="acc-h"><div><p class="eyebrow">${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}</p><h1>Welcome back, ${esc(me.name.split(' ')[0])}</h1></div><a class="s-btn primary" href="repairs.html">${ic('plus', 18)}Book a repair</a></header>
+      <div class="acc-stats"><div><small>Active repairs</small><b>${act.length}</b></div><div><small>Completed</small><b>${done.length}</b></div><div><small>Under warranty</small><b>${done.filter(j => DB.warranties.some(w => w.jobId === j.id && warStatus(w) !== 'expired' && !w.voided)).length}</b></div><div><small>Saved device</small><b class="sm">${dev ? esc(dev.model) : 'None'}</b></div></div>
       <section class="acc-card"><div class="ac-h"><h2>In progress</h2>${act.length ? `<a class="lnk sm" href="#bookings">View all</a>` : ''}</div>
       ${act.length ? act.slice(0, 3).map(j => { const si = stageIndex(j.status), pct = Math.round(si / (STAGES.length - 1) * 100), nx = STAGES[si + 1];
         return `<a class="lv" href="#booking=${j.code}" style="--p:${pct}%"><div class="lv-top"><span class="lv-dev">${ic('phoneDev', 20)}</span><div class="lv-id"><b>${STATUS_COPY[j.status][0]}</b><small>${esc(j.brand)} ${esc(j.model)} · <span class="lv-code">${esc(j.code)}</span></small></div>${stPill(j)}</div>
@@ -157,7 +157,7 @@ const Account = {
         ${items ? `<section class="acc-card"><div class="ac-h"><h2>What’s booked</h2></div><ul class="bd-items">${items}</ul></section>` : `<section class="acc-card"><div class="ac-h"><h2>Repair</h2></div><p>${esc(j.issue)}</p></section>`}</div>
         <aside class="acc-side2"><section class="acc-card"><dl class="kv"><div><dt>${o.handoff === 'pickup' ? 'Pickup' : 'Drop-off'}</dt><dd>${o.handoff === 'pickup' ? esc(o.address) : br.name + ' branch'}</dd></div><div><dt>When</dt><dd>${o.slot ? fmtSlot(o.slot) : fmtDate(j.createdAt)}</dd></div><div><dt>Ready by</dt><dd>${fmtDate(j.due)}</dd></div><div><dt>Payment</dt><dd>${esc(o.pay || 'At collection')}</dd></div><div class="tot2"><dt>${t.due > 0 ? 'Estimated total' : 'Paid'}</dt><dd>${t.total ? fmtBDT(t.due > 0 ? t.total : t.paid) : 'After check'}</dd></div></dl></section>
         <section class="acc-card acts">${can ? `<button class="s-btn block" type="button" data-resched="${j.code}">${ic('calendar', 18)}Reschedule</button>` : ''}<button class="s-btn block" type="button" data-ai-open data-ai-say="I have a question about ${esc(j.code)}">${ic('chat', 18)}Ask about this repair</button>${(o.items || []).length ? `<button class="s-btn block" type="button" data-rebook="${j.code}">${ic('refresh', 18)}Book this again</button>` : ''}${can ? `<button class="s-btn block danger-o" type="button" data-cancel="${j.code}">${ic('x', 18)}Cancel booking</button>` : ''}
-        ${can ? '' : `<p class="muted sm">${j.status === 'cancelled' ? 'This booking was cancelled.' : `Changes are closed once your phone is with us — call ${esc(SHOP.phone)} if anything changes.`}</p>`}</section></aside></div>`;
+        ${can ? '' : `<p class="muted sm">${j.status === 'cancelled' ? 'This booking was cancelled.' : `You can’t change the booking once your phone is with us. Call ${esc(SHOP.phone)} if plans change.`}</p>`}</section></aside></div>`;
   },
   devices() {
     const me = this.me, brands = [...new Set(MODELS.map(m => m.brand))];
