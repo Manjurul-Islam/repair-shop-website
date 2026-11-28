@@ -381,6 +381,10 @@ const Checkout = {
     r.addr = addr; this.done = r; this.receipt = { lines: Shop.lines(), st: { ...st }, dev: Shop.dev };
     Shop.cart = { items: [], addons: [] }; Shop.save(); sessionStorage.removeItem('site:ck'); history.replaceState(null, '', 'checkout.html?booked=' + r.code);
     this.drawDone();
+    const br0 = SHOP.branches.find(b => b.id === st.branch) || SHOP.branches[0], ln = this.receipt.lines, me0 = Acc.me(), fee0 = st.handoff === 'pickup' ? PICKUP_FEE : 0;
+    bookedPopup({ code: r.code, name: st.name, phone: st.phone, sms: st.sms, device: Shop.dev ? Shop.dev.model : this.receipt.dev.model, repair: ln.svc.map(l => l.name).join(', ') || 'Repair', handoff: st.handoff, slot: st.slot, place: st.handoff === 'pickup' ? addr : br0.name + ' · ' + br0.addr, estimate: fmtBDT(ln.sub + fee0),
+      trackHref: me0 ? 'account.html#booking=' + r.code : 'index.html?track=' + r.code + '#track', trackLabel: me0 ? 'View In My Account' : 'Track This Repair', trackIcon: me0 ? 'wrench' : 'search',
+      ics: () => downloadIcs(r.code, { ...st, address: addr, device: this.receipt.dev }), onClose: () => { const t = $('#okTitle'); t && t.focus({ preventScroll: true }); } });
   },
   async saveAccount(f) {
     const st = this.st, email = (f.email ? f.email.value : st.email).trim().toLowerCase(); let bad = null;

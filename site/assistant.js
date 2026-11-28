@@ -111,6 +111,10 @@ const AI = {
     s.done = r.code; s.mode = null; this.persist();
     this.say(`You’re booked. Your repair code is <b>${r.code}</b>, linked to ${esc(s.phone)}.`, { card: 'done', data: r, chips: [['Track ' + r.code, 'track ' + r.code], ['Book another device', 'start over']] });
     document.dispatchEvent(new CustomEvent('site:booked', { detail: r }));
+    { const svc = svcById(s.service), br = SHOP.branches.find(b => b.id === s.branch) || SHOP.branches[0], me2 = typeof Acc !== 'undefined' && Acc.me();
+      bookedPopup({ code: r.code, name: s.name, phone: s.phone, device: s.device.model, repair: svc.name, handoff: s.handoff, slot: s.slot, place: s.handoff === 'pickup' ? s.address : br.name + ' · ' + br.addr,
+        estimate: (svc.id === 'diag' ? 'Free check' : 'From ' + fmtBDT(fromPrice(svc, s.device))) + (s.handoff === 'pickup' ? ' + ' + fmtBDT(PICKUP_FEE) + ' pickup' : ''),
+        trackHref: me2 ? 'account.html#booking=' + r.code : 'index.html?track=' + r.code + '#track', trackLabel: me2 ? 'View In My Account' : 'Track This Repair', trackIcon: me2 ? 'wrench' : 'search', ics: () => downloadIcs(r.code, s) }); }
   },
 
   /* ---------- quick replies ---------- */

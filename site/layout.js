@@ -156,3 +156,51 @@ document.addEventListener('DOMContentLoaded', () => titleCaseAll());
     set(d, open);
   });
 })();
+
+/* ===== Booking confirmed popup (shared by checkout and the assistant) ===== */
+function bookedPopup(d) {
+  document.querySelectorAll('.bk-pop').forEach(x => x.remove());
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, prev = document.activeElement;
+  const pickup = d.handoff === 'pickup';
+  const rows = [
+    ['Device', esc(d.device)],
+    ['Repair', esc(d.repair)],
+    [pickup ? 'Pickup' : 'Drop-off', `${esc(fmtSlot(d.slot))}<small>${esc(d.place)}</small>`],
+    ['Estimate', `${esc(d.estimate)}<small>Final price confirmed after a free check</small>`]
+  ];
+  const el = document.createElement('div'); el.className = 'bk-pop'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'bkT'); el.setAttribute('aria-describedby', 'bkD');
+  el.innerHTML = `<div class="bk-scrim" data-bk-close></div>
+    <div class="bk-card" tabindex="-1">
+      <button class="bk-x" type="button" data-bk-close aria-label="Close">${ic('x', 18)}</button>
+      <div class="bk-hero">
+        <div class="bk-badge" aria-hidden="true"><span class="bk-ring"></span><span class="bk-ring r2"></span><svg viewBox="0 0 52 52"><circle class="bk-c" cx="26" cy="26" r="24"/><path class="bk-tick" d="M15.5 27.2l7 7 14-15"/></svg></div>
+        <p class="bk-k">Booking Confirmed</p>
+        <h2 id="bkT">You’re all set, ${esc(String(d.name || '').split(' ')[0] || 'thanks')}</h2>
+        <p id="bkD" class="bk-sub">We’ve saved your repair against ${esc(d.phone)}.${d.sms ? ' We’ll text you at each step.' : ''}</p>
+      </div>
+      <div class="bk-code"><div><small>Your Repair Code</small><b>${esc(d.code)}</b></div><button type="button" class="bk-copy" data-bk-copy>${ic('copy', 16)}<span>Copy</span></button></div>
+      <dl class="bk-rows">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <ol class="bk-next"><li class="on"><i>${ic('check', 12)}</i><span>Booked</span></li><li><i>2</i><span>${pickup ? 'Pickup' : 'Drop-off'}</span></li><li><i>3</i><span>Free Check</span></li><li><i>4</i><span>Repair</span></li></ol>
+      <div class="bk-acts"><a class="s-btn primary" href="${esc(d.trackHref)}">${ic(d.trackIcon || 'search', 18)}${esc(d.trackLabel || 'Track This Repair')}</a><button class="s-btn" type="button" data-bk-ics>${ic('calendar', 18)}Add To Calendar</button></div>
+      <p class="bk-foot">Keep your code safe. You’ll need it with your phone number to track and collect.</p>
+    </div>`;
+  document.body.appendChild(el); document.documentElement.classList.add('bk-lock');
+  const card = el.querySelector('.bk-card');
+  requestAnimationFrame(() => { el.classList.add('in'); card.focus({ preventScroll: true }); });
+  if (!reduce) bkConfetti(el.querySelector('.bk-hero'));
+  const close = () => { if (el.classList.contains('out')) return; el.classList.remove('in'); el.classList.add('out'); document.documentElement.classList.remove('bk-lock'); document.removeEventListener('keydown', key); setTimeout(() => { el.remove(); if (d.onClose) d.onClose(); else if (prev && prev.focus) prev.focus({ preventScroll: true }); }, reduce ? 0 : 260); };
+  const key = e => { if (e.key === 'Escape') close(); if (e.key === 'Tab') { const f = [...el.querySelectorAll('button,a[href]')]; const i = f.indexOf(document.activeElement); if (e.shiftKey && (i <= 0)) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } } };
+  document.addEventListener('keydown', key);
+  el.addEventListener('click', e => {
+    if (e.target.closest('[data-bk-close]')) return close();
+    const cp = e.target.closest('[data-bk-copy]'); if (cp) { (navigator.clipboard ? navigator.clipboard.writeText(d.code) : Promise.reject()).catch(() => { }); cp.classList.add('ok'); cp.querySelector('span').textContent = 'Copied'; cp.innerHTML = ic('check', 16) + '<span>Copied</span>'; setTimeout(() => { cp.classList.remove('ok'); cp.innerHTML = ic('copy', 16) + '<span>Copy</span>'; }, 1800); return; }
+    if (e.target.closest('[data-bk-ics]') && d.ics) d.ics();
+  });
+  return { close };
+}
+function bkConfetti(host) {
+  const cols = ['#275FCE', '#7DA2EC', '#B7CCF6', '#12B76A', '#F5B83D'], wrap = document.createElement('div'); wrap.className = 'bk-conf'; wrap.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 22; i++) { const p = document.createElement('i'), a = (i / 22) * Math.PI * 2 + Math.random() * .3, r = 70 + Math.random() * 60;
+    p.style.cssText = `--x:${Math.cos(a) * r}px;--y:${Math.sin(a) * r * .75 - 10}px;--r:${Math.random() * 360}deg;--d:${(Math.random() * .12).toFixed(2)}s;background:${cols[i % cols.length]};${i % 3 ? '' : 'border-radius:50%;width:6px;height:6px;'}`; wrap.appendChild(p); }
+  host.appendChild(wrap); setTimeout(() => wrap.remove(), 1600);
+}
