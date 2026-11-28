@@ -96,7 +96,7 @@ const SignIn = {
       <label class="check"><input type="checkbox" name="remember" checked><span>Keep me signed in</span></label>
       <div class="form-e" role="alert"></div><button class="s-btn primary block lg" type="submit">Sign in</button></form>
       <div class="or"><span>or</span></div><button class="s-btn block lg" type="button" id="demoAcc">${ic('zap', 18)}Explore with a demo account</button>
-      <p class="au-alt">New here? <a class="lnk" href="#signup">Create an account</a> or <a class="lnk" href="repairs.html">book as a guest</a>.</p>`;
+      <p class="au-alt">New here? <a class="lnk" href="#signup">Create an account</a>. You need one to place a booking.</p>`;
     if (mode === 'signup') h = `<div class="au-h"><h1>Create your account</h1><p>Use the mobile number you give at the counter, and we’ll link your past repairs automatically.</p></div>
       <form id="af" novalidate><div class="f"><label for="aName">Full name</label><input id="aName" name="name" autocomplete="name" placeholder="Sadia Islam"><p class="f-e"></p></div>
       <div class="f-2"><div class="f"><label for="aPhone">Mobile number</label><input id="aPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01XXXXXXXXX"><p class="f-e"></p></div><div class="f"><label for="aEmail">Email</label><input id="aEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com"><p class="f-e"></p></div></div>
