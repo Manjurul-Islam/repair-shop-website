@@ -1248,3 +1248,11 @@ html.bk-lock{overflow:hidden}
   .bk-acts{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){.bk-card,.bk-scrim{transition:opacity .01s}.bk-card{transform:none!important}.bk-c{transform:none;opacity:1;animation:none!important}.bk-tick{stroke-dashoffset:0;animation:none!important}.bk-ring{display:none}}
+
+/* Hero announce pill: balanced right edge */
+.hero .announce,.announce{padding:0 8px 0 4px!important;gap:10px!important}
+.announce>[data-icon]{display:inline-grid;place-items:center;width:16px;height:16px;margin-left:-4px;flex:none}
+.announce>[data-icon] .ic{width:16px;height:16px}
+.hero .announce,.announce{padding:0 3px 0 4px!important;max-width:100%}
+.announce>[data-icon]{margin-left:-6px}
+@media (max-width:374px){.hero .announce,.announce{font-size:12.5px;gap:8px!important}.announce>[data-icon]{margin-left:-4px}}
