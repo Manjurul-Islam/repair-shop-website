@@ -1124,3 +1124,50 @@ input[type=search]:focus,input[type=search]:focus-visible{outline:0!important;bo
 /* Repairs: no rule lines under the filter bar, space instead */
 .store-bar .sb2{border-bottom:0!important;padding-bottom:0!important}
 .store-bar .sb-meta{border-top:0!important;padding-top:0!important;margin-top:24px!important}
+
+/* ===== v17: one hover lift for every card ===== */
+:root{--card-hover-sh:0 24px 48px -12px rgba(11,19,36,.12),0 4px 12px -4px rgba(11,19,36,.06)}
+.pcard:hover,.pcard.rc:hover,.pm-c:hover,.gd:hover,.gx-card:hover,.gx-card:not(.gx-feat):hover,.la-card:hover,.ar-card:hover,.tc:hover,.vx-card:hover,.lv:hover,.promise:hover,.vcard:hover,.live-bk:hover,.sm-card:hover,.car-track>.pcard:hover{box-shadow:var(--card-hover-sh)!important}
+/* carousel: room for the shadow inside the scroller */
+.car{margin:-24px -24px -40px!important}
+.car-track{padding:24px 24px 40px!important;scroll-padding-inline:24px!important}
+.car-track>.pcard{transition:border-color .2s,transform .3s var(--ease),box-shadow .3s var(--ease)!important}
+.car-foot{margin-top:24px!important}
+/* carousel indicator */
+.car-dots{gap:8px!important;align-items:center}
+.car-dots i{width:10px!important;height:10px!important;border-radius:5px!important}
+.car-dots i.on{width:32px!important}
+/* price board: give the repair name room on every width */
+.pb2-t col.c-time{width:100px!important}.pb2-t col.c-war{width:96px!important}.pb2-t col.c-pr{width:112px!important}.pb2-t col.c-act{width:112px!important}
+.pb2-t td,.pb2-t tbody th,.pb2-t thead th{padding-left:14px!important;padding-right:14px!important}
+.pb-tag{margin-right:8px!important}
+/* checkout: grid track never wider than the screen */
+@media (max-width:980px){.ck-grid{grid-template-columns:minmax(0,1fr)!important}.ck-grid>*{min-width:0}}
+/* filter drawer: hidden off-canvas is not in the layout or tab order */
+@media (max-width:960px){.plp-side:not(.open){visibility:hidden;transition:transform .35s var(--ease),visibility 0s .35s}.plp-side.open{visibility:visible;transition:transform .35s var(--ease)}}
+@media (max-width:640px){.car{margin:-16px -16px -32px!important}.car-track{padding:16px 16px 32px!important;scroll-padding-inline:16px!important}}
+@media (max-width:1180px){.pb-n b{white-space:normal!important;overflow:visible!important}}
+
+/* ===== v17 responsive pass ===== */
+.pb2-t .pb-p{flex-direction:row!important}
+@media (max-width:1180px){.pb2-t .pb-pc .pb-p{justify-content:flex-start!important}}
+/* very large screens: wider container so content does not float in empty space */
+@media (min-width:1680px){:root{--w:1320px}}
+@media (min-width:2200px){:root{--w:1440px}}
+/* tablet nav: icon-only sign in, keep one line */
+@media (max-width:1100px){.nav-r .n-sign{width:40px!important;padding:0!important;justify-content:center}.nav-r .n-sign span{display:none!important}}
+/* repairs header trust row: 2x2 on tablet */
+@media (max-width:900px) and (min-width:641px){.ph2-trust,.plp-trust,.tr-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+/* repairs toolbar: search full width, controls left-aligned under it */
+@media (max-width:960px){.plp .sb2{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  .plp .sb2 .search-in{width:100%!important;max-width:none!important;margin:0!important;flex:none!important}
+  .plp .sb2 .store-tools{display:flex!important;width:100%;justify-content:flex-start!important;gap:8px!important;margin:0!important}
+  .plp .sb2 .store-tools .sel{flex:1 1 auto;min-width:0}.plp .sb2 .store-tools .view-seg{margin-left:auto}}
+/* PDP handoff cards: never clip the label */
+@media (max-width:1180px){.ho-grid,.gt-grid,.pd-hand{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}}
+@media (max-width:900px){.page-hero .ph-trust{grid-template-columns:repeat(2,minmax(0,1fr))!important;row-gap:0}
+  .page-hero .ph-trust li:nth-child(odd){padding-left:0!important;border-left:0!important}
+  .page-hero .ph-trust li:nth-child(n+3){border-top:1px solid var(--nx-line);margin-top:16px}}
+@media (max-width:1180px){.px-hand{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;display:grid!important}}
+@media (max-width:1100px) and (min-width:641px){.br-row li:last-child{grid-column:span 2!important}}
+@media (max-width:960px){.plp .sb2 .store-tools{flex-wrap:nowrap!important}.plp .sb2 .store-tools .view-seg{flex:none}}
