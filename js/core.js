@@ -40,7 +40,13 @@ const csvCell = v => { v = String(v ?? ''); return /[",\n]/.test(v) ? '"' + v.re
 /* Icons: Hugeicons Free (stroke rounded), loaded from js/icons.js. */
 const ICONS = (typeof HUGE_ICONS !== 'undefined') ? HUGE_ICONS : {};
 const icSize = s => s <= 12 ? 14 : s <= 16 ? 16 : s <= 19 ? 18 : s <= 22 ? 20 : 24;
-const ic = (n, s = 18, cls = '') => (s = icSize(s), `<svg class="ic ${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">${ICONS[n] || ''}</svg>`);
+/* Duotone (portal): a soft tinted fill under each closed Hugeicons shape; open strokes stay as lines */
+const __duo = {};
+const duoBack = n => { if (n in __duo) return __duo[n]; const src = ICONS[n] || ''; const parts = src.match(/<(path|circle|rect|ellipse)\b[^>]*\/>/g) || [];
+  const back = parts.filter(p => !/^<path/.test(p) || /d="[^"]*[zZ]\s*"/.test(p)).map(p => p.replace(/stroke="currentColor"/g, 'fill="currentColor"').replace(/\sstroke-(width|linecap|linejoin)="[^"]*"/g, '')).join('');
+  return (__duo[n] = back); };
+const ic = (n, s = 18, cls = '') => { s = icSize(s); const back = window.ICON_DUO && !/\bnoduo\b/.test(cls) ? duoBack(n) : '';
+  return `<svg class="ic${back ? ' duo' : ''} ${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">${back ? `<g class="duo-b">${back}</g>` : ''}${ICONS[n] || ''}</svg>`; };
 const LOGO = (s = 28) => `<svg class="logo-mark" width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M11.5 8.5v15M11.5 8.5h5.25a3.6 3.6 0 0 1 0 7.2H11.5M11.5 15.7h6.1a3.9 3.9 0 0 1 0 7.8H11.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22.6" cy="9.6" r="1.7" fill="#9FC0FF"/></svg>`;
 
 /* ---------- storage ---------- */
