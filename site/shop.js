@@ -255,7 +255,7 @@ const Shop = {
     const el = $('#cartDrawer'); if (!el) return; const L = this.lines(), d = this.dev;
     const sugg = Bridge.addons().filter(a => a.stock > 0 && !this.cart.addons.some(x => x.itemId === a.id) && (this.has('screen') ? /glass/i.test(a.name) : true)).slice(0, 2);
     el.innerHTML = `<header class="dr-h"><div><h2 id="cartTitle">Your booking</h2><p>${ic('phoneDev', 14)}<span>${esc(d.model)}</span> · one device per booking</p></div><button class="x" type="button" data-close-layer aria-label="Close">${ic('x', 20)}</button></header>
-      <div class="dr-b">${!L.svc.length && !L.adds.length ? `<div class="dr-empty"><span>${ic('cart', 24)}</span><h3>Nothing added yet</h3><p>Pick a repair for your ${esc(d.model)}, or describe the problem and the assistant will choose for you.</p><div><a class="s-btn primary sm" href="repairs.html">Browse repairs</a><button class="s-btn sm" type="button" data-cart-ai>Ask the assistant</button></div></div>` :
+      <div class="dr-b">${!L.svc.length && !L.adds.length ? emptyCartHtml('drawer') :
       `<ul class="lines">${L.svc.concat(L.adds).map(l => `<li><span class="l-art">${art(l.art)}</span><div class="l-t"><b>${esc(l.name)}</b><small class="${/Only/.test(l.sub) ? 'warn' : ''}">${esc(l.sub)}</small>${l.kind === 'svc' && GRADED.includes(l.id) ? `<a class="lnk sm" href="repair.html?id=${l.id}">Change part</a>` : ''}</div><div class="l-r"><b>${l.price ? fmtBDT(l.price) : 'Free'}</b>${l.kind === 'addon' ? `<div class="qty sm"><button type="button" data-addon-dec="${l.id}" aria-label="Remove one">${ic('minus', 14)}</button><b>${l.qty}</b><button type="button" data-addon-inc="${l.id}" aria-label="Add one">${ic('plus', 14)}</button></div>` : `<button type="button" class="rm" data-remove="${l.id}" aria-label="Remove ${esc(l.name)}">Remove</button>`}</div></li>`).join('')}</ul>
       ${!L.svc.length ? `<div class="dr-need">${ic('info', 16)}<p>Add-ons are collected with a repair. <button type="button" class="lnk" data-add-free>Add a free check</button> or pick a repair.</p></div>` : ''}
       ${sugg.length ? `<div class="dr-sugg"><h4>Often added</h4>${sugg.map(a => `<div class="sg-i"><span class="l-art">${art(addonArt(a.name))}</span><div><b>${esc(a.name)}</b><small>${fmtBDT(a.price)}</small></div><button type="button" class="s-btn sm" data-addon-add="${a.id}" data-silent>${ic('plus', 16)}Add</button></div>`).join('')}</div>` : ''}`}</div>
@@ -282,6 +282,27 @@ const Shop = {
 
 /* ================= CHECKOUT PAGE ================= */
 const PAYS = [['Cash', 'wallet', 'Pay at the counter'], ['bKash', 'phoneDev', 'Scan or send at collection'], ['Nagad', 'phoneDev', 'Scan or send at collection'], ['Card', 'card', 'Visa, Mastercard, Amex']];
+
+/* Shared empty-cart design (checkout page + cart drawer) */
+const EMPTY_ART = `<svg class="ec-art" viewBox="0 0 200 150" aria-hidden="true"><defs><radialGradient id="ecG" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#E3EBFC"/><stop offset="1" stop-color="#E3EBFC" stop-opacity="0"/></radialGradient><linearGradient id="ecP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A72DE"/><stop offset="1" stop-color="#1F4FB0"/></linearGradient></defs>
+  <circle cx="100" cy="72" r="70" fill="url(#ecG)"/><ellipse cx="100" cy="134" rx="54" ry="5" fill="#DCE5F7"/>
+  <rect class="ec-slot" x="44" y="48" width="112" height="72" rx="16" fill="#fff" stroke="#B7CCF6" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <rect x="58" y="62" width="22" height="40" rx="6" fill="#EEF3FD" stroke="#C9D8F6" stroke-width="1.5"/><rect x="65" y="66" width="8" height="2" rx="1" fill="#C9D8F6"/>
+  <rect x="90" y="68" width="50" height="7" rx="3.5" fill="#E8EEF9"/><rect x="90" y="82" width="34" height="7" rx="3.5" fill="#EEF2F9"/><rect x="90" y="96" width="42" height="7" rx="3.5" fill="#F2F5FA"/>
+  <g class="ec-plus"><circle cx="152" cy="46" r="16" fill="url(#ecP)"/><path d="M152 39v14M145 46h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></g>
+  <path class="ec-sp s1" d="M40 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#9DB6E8"/><path class="ec-sp s2" d="M170 96l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z" fill="#B7CCF6"/><circle class="ec-sp s3" cx="30" cy="92" r="3" fill="#D5E0F7"/>
+</svg>`;
+function emptyCartHtml(where) {
+  const d = Shop.dev, pick = ['screen', 'battery', 'port'].map(id => SERVICES.find(x => x.id === id)).filter(Boolean).slice(0, 3);
+  const big = where === 'page';
+  return `<div class="ec ${big ? 'ec-page' : 'ec-drawer'}">${EMPTY_ART}
+    <${big ? 'h1' : 'h3'} class="ec-t" tabindex="-1">Your Booking Is Empty</${big ? 'h1' : 'h3'}>
+    <p class="ec-p">Pick a repair for your ${esc(d.model)}, or tell the assistant what happened and it will choose for you.</p>
+    <div class="ec-a"><a class="s-btn primary" href="repairs.html">${ic('search', 18)}Browse Repairs</a><button class="s-btn" type="button" ${big ? 'data-ai-open' : 'data-cart-ai'}>${ic('chat', 18)}Ask The Assistant</button></div>
+    ${pick.length ? `<div class="ec-pop"><p class="ec-k">Popular for ${esc(d.model)}</p><ul>${pick.map(x => `<li><span class="l-art">${art(META[x.id] ? META[x.id].art : 'screen')}</span><div><b>${esc(x.name)}</b><small>From ${fmtBDT(fromPrice(x, d))}</small></div><button type="button" class="ec-add" data-add="${x.id}" aria-label="Add ${esc(x.name)}">${ic('plus', 16)}<span>Add</span></button></li>`).join('')}</ul></div>` : ''}
+    ${big ? `<ul class="ec-trust"><li>${ic('check', 14)}Free diagnosis</li><li>${ic('check', 14)}Pay when you collect</li><li>${ic('check', 14)}No work without your OK</li></ul>` : ''}</div>`;
+}
+
 const Checkout = {
   st: null, done: null,
   init() {
@@ -307,13 +328,20 @@ const Checkout = {
       <dl class="cs-tot"><div><dt>Repairs & add-ons</dt><dd>${tk(L.sub)}</dd></div><div><dt>${this.st.handoff === 'pickup' ? 'Courier pickup & return' : 'Drop-off'}</dt><dd>${fee ? fmtBDT(fee) : 'Free'}</dd></div><div><dt>Diagnosis</dt><dd>Free</dd></div><div class="grand"><dt>Estimated total</dt><dd>${grand}</dd></div></dl>
       <p class="cs-note">${ic('secure', 16)}<span>Pay nothing now. If the check finds a different fault, we call you first. You can say no and pay nothing.</span></p></div></details></aside>`;
   },
+  stepper() {
+    const s = this.st.step, steps = [['Your Repair', 'Device and issue', 'wrench'], ['Handoff', 'Drop-off or pickup', 'building'], ['Your Details', 'Name and number', 'user'], ['Confirm', 'Review and book', 'secure']];
+    return `<div class="ck-stepper"><ol class="ck-steps" aria-label="Booking progress">${steps.map(([t, sub, i], k) => { const n = k + 1, c = n < s ? 'done' : n === s ? 'cur' : 'todo'; const inner = `<span class="st-dot">${n < s ? ic('check', 14) : ic(i, 16)}</span><span class="st-t"><small>Step ${n}</small><b>${t}</b></span>`;
+      return `<li class="${c}" ${n === s ? 'aria-current="step"' : ''}>${n < s ? `<button type="button" data-ck-go="${n}" aria-label="Go back to step ${n}, ${t}">${inner}</button>` : `<div>${inner}</div>`}</li>`; }).join('')}</ol>
+      <div class="ck-steps-m" aria-hidden="true"><span>Step ${s} of 4</span><b>${steps[s - 1][0]}</b><i style="--p:${s / 4}"></i></div></div>`;
+  },
   sec(n, title, body, sumLine) {
     const s = this.st.step, state = n < s ? 'done' : n === s ? 'open' : 'next';
-    return `<section class="ck-sec ${state}" aria-labelledby="ckS${n}"><header><span class="n">${n < s ? ic('check', 14) : n}</span><h2 id="ckS${n}">${title}</h2>${state === 'done' ? `<button type="button" class="lnk sm" data-ck-go="${n}" aria-label="Edit ${title}">Edit</button>` : ''}</header>${state === 'done' ? `<p class="ck-line">${sumLine}</p>` : state === 'open' ? `<form class="ck-body" novalidate data-ck-step="${n}">${body}<div class="ck-nav">${n === 4 ? '' : `<button class="s-btn primary" type="submit">Continue${ic('right', 18)}</button>`}</div></form>` : ''}</section>`;
+    if (state === 'next') return '';
+    return `<section class="ck-sec ${state}" aria-labelledby="ckS${n}"><header><span class="n">${n < s ? ic('check', 14) : n}</span>${state === 'open' ? `<p class="ck-kick">Step ${n} of 4</p>` : ''}<h2 id="ckS${n}">${title}</h2>${state === 'done' ? `<button type="button" class="lnk sm" data-ck-go="${n}" aria-label="Edit ${title}">Edit</button>` : ''}</header>${state === 'done' ? `<p class="ck-line">${sumLine}</p>` : state === 'open' ? `<form class="ck-body" novalidate data-ck-step="${n}">${body}${n === 4 ? '' : `<div class="ck-nav">${n > 1 ? `<button class="s-btn ghost" type="button" data-ck-go="${n - 1}">${ic('left', 18)}Back</button>` : '<span></span>'}<button class="s-btn primary" type="submit">Continue${ic('right', 18)}</button></div>`}</form>` : ''}</section>`;
   },
   draw(focus) {
     const m = $('#ckMain'); if (this.done) return this.drawDone();
-    const L = Shop.lines(); if (!L.svc.length) { m.innerHTML = `<div class="ck-empty">${ic('cart', 28)}<h1>Your booking is empty</h1><p>Add a repair to continue, or describe the problem and the assistant will set it up.</p><div><a class="s-btn primary" href="repairs.html">Browse repairs</a><button class="s-btn" type="button" data-ai-open>Ask the assistant</button></div></div>`; return; }
+    const L = Shop.lines(); if (!L.svc.length) { m.innerHTML = `<div class="ck-empty-wrap">${emptyCartHtml('page')}</div>`; return; }
     const st = this.st, me = Acc.me(), days = slotDays(5), day = (st.slot && days.find(x => x.date === st.slot.date)) || days[0], br = SHOP.branches.find(b => b.id === st.branch);
     const s1 = `<div class="ck-dev">${Shop.devPicker('ck')}</div><ul class="ck-items">${L.svc.map(l => `<li><span class="l-art">${art(l.art)}</span><div><b>${l.name}</b><small>${l.sub}</small></div><span>${l.price ? fmtBDT(l.price) : 'Free'}</span><button type="button" class="rm" data-remove="${l.id}">Remove</button></li>`).join('')}</ul><a class="lnk sm add-more" href="repairs.html">${ic('plus', 14)}Add another repair or add-on</a>
       <div class="f"><label for="ckNote">What’s happening with your phone? <span class="opt-l">Optional</span></label><textarea id="ckNote" name="note" rows="3" maxlength="200" placeholder="e.g. Dropped it on Tuesday. Touch still works but there are green lines on the left.">${esc(st.note)}</textarea><p class="f-h">Helps your technician prepare the right part before you arrive.</p></div>`;
@@ -329,7 +357,7 @@ const Checkout = {
       <div class="ck-review"><h3>Check your booking</h3><dl><div><dt>Device</dt><dd>${esc(Shop.dev.model)}</dd></div><div><dt>${st.handoff === 'pickup' ? 'Pickup' : 'Drop-off'}</dt><dd>${st.handoff === 'pickup' ? esc(this.pickupAddr()) : br.name + ' branch'}</dd></div><div><dt>When</dt><dd>${fmtSlot(st.slot)}</dd></div><div><dt>Contact</dt><dd>${esc(st.name)} · ${esc(st.phone)}</dd></div></dl></div>
       <label class="check agree"><input type="checkbox" name="agree" ${st.agree ? 'checked' : ''}><span>I understand the final price is confirmed after a free check, and no work starts without my approval.</span></label><p class="f-e" id="ckAgreeErr"></p>
       <button class="s-btn primary block lg" type="submit" data-confirm-ck>${ic('lock', 18)}Confirm booking</button>`;
-    m.innerHTML = `<div class="ck-grid"><div class="ck-flow"><nav class="crumbs" aria-label="Breadcrumb"><a href="repairs.html">Repairs</a>${ic('right', 14)}<button type="button" class="lnk-plain" data-open-cart>Booking</button>${ic('right', 14)}<span aria-current="page">Checkout</span></nav><h1>Book your repair</h1><p class="ck-sub">Four short steps. You’ll get a repair code at the end.</p>
+    m.innerHTML = `<div class="ck-head"><nav class="crumbs" aria-label="Breadcrumb"><a href="repairs.html">Repairs</a>${ic('right', 14)}<button type="button" class="lnk-plain" data-open-cart>Booking</button>${ic('right', 14)}<span aria-current="page">Checkout</span></nav><h1>Book your repair</h1><p class="ck-sub">Four short steps. You’ll get a repair code at the end, and you pay nothing today.</p>${this.stepper()}</div><div class="ck-grid"><div class="ck-flow">
       ${this.sec(1, 'Your repair', s1, `${esc(Shop.dev.model)} · ${L.svc.map(l => esc(l.name)).join(', ')}${st.note ? ': “' + esc(st.note.slice(0, 50)) + (st.note.length > 50 ? '…' : '') + '”' : ''}`)}
       ${this.sec(2, 'Drop-off or pickup', s2, `${st.handoff === 'pickup' ? 'Courier pickup · ' + esc(this.pickupAddr()) : 'Drop off at ' + (br ? br.name : '')} · ${fmtSlot(st.slot)}`)}
       ${this.sec(3, 'Your details', s3, `${esc(st.name)} · ${esc(st.phone)}${st.email ? ' · ' + esc(st.email) : ''}`)}
@@ -351,6 +379,7 @@ const Checkout = {
   },
   click(e) {
     const t = e.target, st = this.st;
+    const qa = t.closest('.ec [data-add]'); if (qa) { Shop.add(qa.dataset.add, 'compatible', true); return this.draw(true); }
     const g = t.closest('[data-ck-go]'); if (g) { this.read(); st.step = +g.dataset.ckGo; return this.draw(true); }
     const dy = t.closest('[data-ckday]'); if (dy) { this.read(); st.slot = st.slot && st.slot.date === dy.dataset.ckday ? st.slot : { date: dy.dataset.ckday, time: null }; this.draw(); $(`[data-ckday="${dy.dataset.ckday}"]`).focus(); return; }
     const tm = t.closest('[data-cktime]'); if (tm) { this.read(); const [date, time] = tm.dataset.cktime.split('|'); st.slot = { date, time }; this.persist(); this.draw(); $(`[data-cktime="${tm.dataset.cktime}"]`).focus(); return; }
