@@ -1112,3 +1112,15 @@ input[type=search]:focus,input[type=search]:focus-visible{outline:0!important;bo
 @media (prefers-reduced-motion:reduce){.car-track{scroll-behavior:auto}}
 .car-track{scroll-padding-inline:8px}.car-track>.pcard.rv{transform:none!important}
 @media (max-width:640px){.car-foot{flex-direction:column!important;margin-top:20px}}
+
+/* ===== v16 ===== */
+/* Title to content: one decent gap everywhere */
+.nx-head,.dark-head,.nx-split{margin-bottom:40px!important}
+@media (max-width:640px){.nx-head,.dark-head,.nx-split{margin-bottom:28px!important}}
+/* Carousel cards: no shadow (it was clipped by the scroller); lift with the border instead */
+.car-track>.pcard,.car-track>.pcard:hover{box-shadow:none!important}
+.car-track>.pcard{transition:border-color .2s,transform .3s var(--ease)!important}
+.car-track>.pcard:hover{border-color:#C4D3EE!important}
+/* Repairs: no rule lines under the filter bar, space instead */
+.store-bar .sb2{border-bottom:0!important;padding-bottom:0!important}
+.store-bar .sb-meta{border-top:0!important;padding-top:0!important;margin-top:24px!important}
