@@ -47,7 +47,7 @@ const invPill = inv => { const s = invStatus(inv); return pill(INV_ST[s][0], INV
 function voidInvoice(inv, refund = true) {
   if (inv.void) return;
   const paid = invPaid(inv); inv.void = true;
-  if (refund && paid > 0) addPayment({ amount: -paid, method: 'Cash', invoiceId: inv.id, note: 'Refund — invoice voided', branch: inv.branch });
+  if (refund && paid > 0) addPayment({ amount: -paid, method: 'Cash', invoiceId: inv.id, note: 'Refund: invoice voided', branch: inv.branch });
   if (inv.type === 'sale') { const s = byId(DB.sales, inv.saleId); if (s && !s.void) { s.void = true; s.lines.forEach(l => l.itemId && moveStock(l.itemId, l.qty, 'Sale voided', s.code)); } DB.warranties.filter(w => w.saleId === inv.saleId).forEach(w => w.voided = true); }
   logAct(`Voided invoice ${inv.code}`, 'invoices/' + inv.code);
 }
@@ -83,7 +83,7 @@ function removeJobPart(j, partId) {
 }
 function setJobStatus(j, st, note) {
   if (j.status === st) return; const from = j.status; j.status = st;
-  logJob(j, `Status: ${JOB_ST[from].l} → ${JOB_ST[st].l}${note ? ' — ' + note : ''}`);
+  logJob(j, `Status: ${JOB_ST[from].l} → ${JOB_ST[st].l}${note ? ': ' + note : ''}`);
   logAct(`${j.code} moved to ${JOB_ST[st].l}`, 'jobs/' + j.code);
 }
 function deliverJob(j, { date, pay = 0, method = 'Cash', warrantyDays = 0 }) {
@@ -182,13 +182,13 @@ function attentionItems() {
   open.filter(j => j.due < t).sort((a, b) => a.due.localeCompare(b.due)).slice(0, 4).forEach(j => out.push({ id: 'od:' + j.id, tone: 'red', icon: 'clock', t: `${j.code} is ${diffDays(t, j.due)}d overdue`, s: `${custName(j.custId)} · ${j.brand} ${j.model}`, href: 'jobs/' + j.code, cta: 'Open job' }));
   open.filter(j => j.online && j.status === 'received' && j.online.slot && j.online.slot.date === t).sort((a, b) => a.online.slot.time.localeCompare(b.online.slot.time)).slice(0, 3).forEach(j => out.push({ id: 'appt:' + j.id, tone: 'blue', icon: 'calendar', t: `${j.code} ${j.online.handoff === 'pickup' ? 'courier pickup' : 'drop-off'} today at ${j.online.slot.time}`, s: `${custName(j.custId)} · ${j.brand} ${j.model} · booked online`, href: 'jobs/' + j.code, cta: 'Open booking' }));
   open.filter(j => j.status === 'quote').slice(0, 3).forEach(j => out.push({ id: 'quote:' + j.id, tone: 'amber', icon: 'clock', t: `${j.code} is waiting for customer approval`, s: `${money((j.quote || {}).amount || 0)} quoted ${j.quote ? ago(j.quote.sentAt) : ''} · ${custName(j.custId)}`, href: 'jobs/' + j.code, cta: 'Follow up' }));
-  const ready = open.filter(j => j.status === 'ready'); if (ready.length) out.push({ id: 'ready:' + ready.length, tone: 'green', icon: 'phoneDev', t: `${ready.length} device${ready.length > 1 ? 's' : ''} ready for pickup`, s: 'Let customers know to collect them', href: 'jobs', cta: 'View jobs' });
+  const ready = open.filter(j => j.status === 'ready'); if (ready.length) out.push({ id: 'ready:' + ready.length, tone: 'green', icon: 'phoneDev', t: `${ready.length} device${ready.length > 1 ? 's' : ''} ready for pickup`, s: 'Not collected yet', href: 'jobs', cta: 'View jobs' });
   if (isMgr()) {
     DB.items.filter(i => itemState(i) !== 'ok').sort((a, b) => a.stock - b.stock).slice(0, 3).forEach(i => out.push({ id: 'ls:' + i.id + ':' + i.stock, tone: i.stock <= 0 ? 'red' : 'amber', icon: 'package', t: i.stock <= 0 ? `${i.name} is out of stock` : `Low stock: ${i.name}`, s: `${i.stock} left · reorder at ${i.reorder}`, href: 'inventory/' + i.id, cta: 'Restock' }));
     const unpaid = DB.invoices.filter(i => !i.void && invBalance(i) > 0 && diffDays(t, i.due) >= 3);
     if (unpaid.length) out.push({ id: 'unpaid:' + unpaid.length, tone: 'amber', icon: 'file', t: `${unpaid.length} invoice${unpaid.length > 1 ? 's' : ''} with balance due`, s: `${money(sum(unpaid, invBalance))} outstanding`, href: 'invoices', cta: 'Review' });
   }
-  DB.warranties.filter(w => warStatus(w) === 'expiring').slice(0, 2).forEach(w => out.push({ id: 'wx:' + w.id, tone: 'blue', icon: 'shield', t: `Warranty ${w.code} expires in ${Math.max(0, diffDays(w.expires, t))}d`, s: `${w.title} · ${custName(w.custId)}`, href: 'warranty', cta: 'View' }));
+  DB.warranties.filter(w => warStatus(w) === 'expiring').slice(0, 2).forEach(w => out.push({ id: 'wx:' + w.id, tone: 'blue', icon: 'shield', t: diffDays(w.expires, t) <= 0 ? `Warranty ${w.code} expires today` : `Warranty ${w.code} expires in ${diffDays(w.expires, t)}d`, s: `${w.title} · ${custName(w.custId)}`, href: 'warranty', cta: 'View' }));
   return out;
 }
 function navCounts() {

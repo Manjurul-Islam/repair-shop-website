@@ -143,7 +143,7 @@ function authView(mode) {
   if (mode === 'forgot') h = `<a href="#/login" class="back">${ic('left', 16)}Back to sign in</a><div class="auth-head"><h1>Reset your password</h1><p class="sub">Enter your account email and we’ll send a 6-digit code.</p></div>
   <form id="authForm" novalidate>${txtField('email', 'Email', 'email', 'username', 'placeholder="you@shop.com"')}${formError()}<button class="btn primary lg block" type="submit">Send reset code</button></form>`;
   if (mode === 'reset') { const r = LS.get('qf:reset', null) || {}; h = `<a href="#/forgot" class="back">${ic('left', 16)}Use a different email</a><div class="auth-head"><h1>Check your code</h1><p class="sub">We sent a 6-digit code to <b>${esc(r.email || '')}</b>.</p></div>
-  <div class="mail-preview"><div class="mp-h">${ic('mail', 16)}Demo mode — no email service is connected</div><div>Your reset code is <b class="mp-code">${esc(r.code || '')}</b></div></div>
+  <div class="mail-preview"><div class="mp-h">${ic('mail', 16)}Demo mode: no email service is connected</div><div>Your reset code is <b class="mp-code">${esc(r.code || '')}</b></div></div>
   <form id="authForm" novalidate>${txtField('code', '6-digit code', 'text', 'one-time-code', 'inputmode="numeric" maxlength="6" placeholder="000000"')}${pwField('password', 'New password', 'new-password', 'aria-describedby="pwRules"')}${pwRules()}${formError()}<button class="btn primary lg block" type="submit">Update password</button></form>`; }
   root.innerHTML = authShell(h, mode);
   const form = $('#authForm'); const err = m => { const e = $('#formErr'); if (e) { e.innerHTML = m ? ic('alert', 16) + '<span>' + esc(m) + '</span>' : ''; e.classList.toggle('on', !!m); } };
@@ -188,7 +188,7 @@ function authView(mode) {
     if (!/^\d{6}$/.test(code)) { fe('code', 'Enter the 6-digit code'); bad = true; } if (pw.length < 8 || !/\d/.test(pw)) { fe('password', '8+ characters including a number'); bad = true; } if (bad) return;
     if (!r || Date.now() > r.exp) return err('This code has expired. Request a new one.'); if (code !== r.code || !r.exists) return fe('code', 'Incorrect code');
     busy(true); const u = getUsers().find(x => x.email === r.email); u.salt = uid('s'); u.hash = await hashPw(pw, u.salt); u.failed = 0; u.lockUntil = 0; saveUser(u); LS.del('qf:reset');
-    location.hash = '#/login'; setTimeout(() => toast('Password updated — sign in with your new password'), 200);
+    location.hash = '#/login'; setTimeout(() => toast('Password updated. Sign in with your new password'), 200);
   });
   const first = $('input', form); first && first.focus();
 }
