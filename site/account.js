@@ -57,11 +57,39 @@ const SignIn = {
   init() {
     if (Acc.me() && !location.hash.startsWith('#reset')) { location.replace(qs('next') || 'account.html#overview'); return; }
     addEventListener('hashchange', () => this.draw()); this.draw();
-    loop($('.au-loop'), 3, 3200, i => { $$('.au-card').forEach((c, n) => c.classList.toggle('on', n === i)); $$('.au-dots i').forEach((d, n) => d.classList.toggle('on', n === i)); });
+    this.story();
+  },
+  story() {
+    const st = $('.au-story'); if (!st || st.dataset.on) return; st.dataset.on = 1;
+    const mk = $('[data-logo]', st); if (mk && typeof LOGO === 'function') mk.innerHTML = LOGO(32);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, steps = $$('[data-au-step]', st), cards = $$('[data-scene]', st), DUR = 6000;
+    let ph = 0, t = 0, last = performance.now(), hold = false;
+    const paint = () => { steps.forEach((b, n) => { b.classList.toggle('current', n === ph); b.setAttribute('aria-pressed', String(n === ph)); $('.aus-bar i', b).style.transform = `scaleX(${n === ph ? Math.min(1, t / DUR) : 0})`; }); cards.forEach((c, n) => c.classList.toggle('on', n === ph)); };
+    steps.forEach((b, n) => b.addEventListener('click', () => { ph = n; t = 0; last = performance.now(); paint(); }));
+    st.addEventListener('pointerenter', () => hold = true); st.addEventListener('pointerleave', () => { hold = false; last = performance.now(); });
+    const tick = now => { if (!st.isConnected) return; if (!hold && !reduce && !document.hidden) { t += now - last; if (t >= DUR) { t = 0; ph = (ph + 1) % steps.length; } } last = now; paint(); requestAnimationFrame(tick); };
+    paint(); requestAnimationFrame(tick);
+    /* cursor spotlight on the grid, eased and kept off text and cards */
+    if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const pat = $('.au-pat', st); const setCut = () => { const c = $('.au-copy', st); if (c) pat.style.setProperty('--cut', Math.round(c.getBoundingClientRect().top - st.getBoundingClientRect().top - 24) + 'px'); }; setCut(); addEventListener('resize', setCut); let tx = 0, ty = 0, x = 0, y = 0, on = 0, ton = 0, raf = 0;
+      const blocks = () => $$('.au-brand,.au-card.on,.au-copy,.au-steps', st);
+      const loopP = () => { x += (tx - x) * .085; y += (ty - y) * .085; on += (ton - on) * .07; pat.style.setProperty('--mx', x.toFixed(1) + 'px'); pat.style.setProperty('--my', y.toFixed(1) + 'px'); pat.style.setProperty('--on', on.toFixed(3));
+        raf = (Math.abs(tx - x) > .2 || Math.abs(ty - y) > .2 || Math.abs(ton - on) > .002) ? requestAnimationFrame(loopP) : 0; };
+      const kick = () => { if (!raf) raf = requestAnimationFrame(loopP); };
+      st.addEventListener('pointermove', e => { const r = st.getBoundingClientRect(); tx = e.clientX - r.left; ty = e.clientY - r.top;
+        const over = blocks().some(el => { const b = el.getBoundingClientRect(); return e.clientX >= b.left - 12 && e.clientX <= b.right + 12 && e.clientY >= b.top - 12 && e.clientY <= b.bottom + 12; });
+        if (on < .02) { x = tx; y = ty; } ton = over ? 0 : 1; kick(); });
+      st.addEventListener('pointerleave', () => { ton = 0; kick(); });
+    }
+  },
+  storyMode(mode) {
+    const T = { signup: ['Create your account in a minute', 'Your past repairs link to your mobile number, so everything you’ve booked with us shows up straight away.'],
+      signin: ['Every repair you book, in one place', 'Follow each repair as it happens, book again in a tap and keep your warranties together.'] }[mode === 'signup' ? 'signup' : 'signin'];
+    const a = $('[data-au-title]'), b = $('[data-au-sub]'); if (a && a.textContent !== T[0]) { a.textContent = T[0]; b.textContent = T[1]; }
   },
   next() { const n = qs('next'); return n && !/^https?:|^\/\//.test(n) ? n : 'account.html#overview'; },
   draw() {
-    const mode = (location.hash.replace('#', '') || 'signin').split('=')[0]; const box = $('#authBox'); let h = '';
+    const mode = (location.hash.replace('#', '') || 'signin').split('=')[0]; const box = $('#authBox'); let h = ''; this.storyMode(mode);
     if (mode === 'signin') h = `<div class="au-h"><h1>Welcome back</h1><p>Sign in to see your repairs, rebook in a tap and check out faster.</p></div>
       <form id="af" novalidate><div class="f"><label for="aId">Email or mobile number</label><input id="aId" name="id" autocomplete="username" placeholder="you@example.com or 01XXXXXXXXX"><p class="f-e"></p></div>
       ${pwInput('aPw', 'pw', 'Password', 'current-password', '<a class="lnk sm" href="#forgot">Forgot password?</a>')}

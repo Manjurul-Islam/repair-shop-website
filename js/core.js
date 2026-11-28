@@ -90,6 +90,7 @@ const NAV = [
   { k: 'sales', l: 'Sales (POS)', i: 'receipt', r: ['owner', 'manager', 'cashier'] },
   { k: 'invoices', l: 'Invoices', i: 'file', r: ['owner', 'manager', 'cashier'] },
   { k: 'expenses', l: 'Expenses', i: 'wallet', r: ['owner', 'manager'] },
+  { k: 'dayclose', l: 'Day close', i: 'lock', r: ['owner', 'manager', 'cashier'] },
   { k: 'warranty', l: 'Warranty', i: 'shield', r: ['owner', 'manager', 'technician', 'cashier'] },
   { k: 'reviews', l: 'Reviews', i: 'star', r: ['owner', 'manager'] },
   { k: 'staff', l: 'Staff', i: 'users', r: ['owner', 'manager'] },

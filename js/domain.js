@@ -87,6 +87,7 @@ function setJobStatus(j, st, note) {
   logAct(`${j.code} moved to ${JOB_ST[st].l}`, 'jobs/' + j.code);
 }
 function deliverJob(j, { date, pay = 0, method = 'Cash', warrantyDays = 0 }) {
+  if (j.intake && j.intake.pass) { j.intake.pass = ''; j.intake.passErased = true; }
   date = date || todayS(); const t = jobTotals(j);
   const lines = []; if (t.labor) lines.push({ desc: 'Repair labor / service', qty: 1, price: t.labor, cost: 0 });
   j.parts.forEach(p => lines.push({ itemId: p.itemId, desc: p.name, qty: p.qty, price: p.price, cost: p.cost }));

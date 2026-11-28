@@ -9,27 +9,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=40"><link rel="stylesheet" href="pages.css?v=40"><link rel="stylesheet" href="lower.css?v=41">
-<link rel="stylesheet" href="nx.css?v=53">
+<link rel="stylesheet" href="nx.css?v=65">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap">
 </head>
 <body data-page="signin">
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav" id="nav"></header>
 <main id="main" class="au">
-  <aside class="au-story" data-theme="dark"><div class="au-mesh" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="au-top"><p class="eyebrow light">Your repair desk</p><h2>Every repair, <em>in one calm place</em></h2><p>See live status, reschedule or cancel, rebook in a tap and keep warranties together.</p></div>
-    <div class="au-loop" aria-hidden="true">
-      <div class="au-card on"><div class="auc-h"><span class="auc-ic" data-icon="wrench"></span><div><small>RJ-1093 · iPhone 13</small><b>Repair in progress</b></div><span class="auc-pill">Repairing</span></div><div class="auc-bar"><i style="width:62%"></i></div><p>Sabbir is fitting your new display.</p></div>
-      <div class="au-card"><div class="auc-h"><span class="auc-ic ok" data-icon="okCircle"></span><div><small>RJ-1087 · Galaxy A54</small><b>Ready for pickup</b></div><span class="auc-pill ok">Ready</span></div><div class="auc-bar"><i style="width:100%"></i></div><p>Collect at <span data-cfg="branch2"></span> any time before <span data-cfg="close"></span>.</p></div>
-      <div class="au-card"><div class="auc-h"><span class="auc-ic" data-icon="shield"></span><div><small>RJ-1042 · iPhone 12</small><b>Warranty active</b></div><span class="auc-pill">64 days left</span></div><div class="auc-bar"><i style="width:30%"></i></div><p>Same fault again? We fix it free.</p></div>
-      <div class="au-dots"><i class="on"></i><i></i><i></i></div>
+  <aside class="au-story" data-theme="dark" aria-label="About your account">
+    <a href="index.html" class="au-brand" aria-label="Dhanmondi Mobile Care home"><span data-au-logo></span><span>Dhanmondi <em>Mobile Care</em></span></a>
+    <div class="au-pat" aria-hidden="true"><i class="ap-grid"></i><i class="ap-glow"></i><span class="ap-hover"><i class="ap-spot"></i><i class="ap-lit"></i></span></div>
+    <div class="au-stage" aria-hidden="true">
+      <div class="au-card on" data-scene="0"><div class="auc-h"><span class="auc-ic" data-icon="wrench"></span><div><small>RJ-1093 · iPhone 13</small><b>Repair in progress</b></div><span class="auc-pill">Repairing</span></div><div class="auc-bar"><i style="width:62%"></i></div><p>Sabbir is fitting your new display.</p></div>
+      <div class="au-card" data-scene="1"><div class="auc-h"><span class="auc-ic" data-icon="cart"></span><div><small>Screen replacement · iPhone 13</small><b>Book it again</b></div><span class="auc-pill">1 tap</span></div><div class="auc-row"><span>Your details</span><b>Filled in</b></div><div class="auc-row"><span>Next slot</span><b>Tomorrow 10:00</b></div></div>
+      <div class="au-card" data-scene="2"><div class="auc-h"><span class="auc-ic ok" data-icon="shield"></span><div><small>RJ-1042 · iPhone 12</small><b>Warranty active</b></div><span class="auc-pill ok">64 days left</span></div><div class="auc-bar"><i style="width:30%"></i></div><p>Same fault again? We fix it for free.</p></div>
     </div>
-    <ul class="au-list"><li><span data-icon="lock"></span>Your password is hashed on this device</li><li><span data-icon="okCircle"></span>Past repairs linked by your mobile number</li></ul>
+    <div class="au-copy"><h2 data-au-title>Every repair you book, in one place</h2><p data-au-sub>Follow each repair as it happens, book again in a tap and keep your warranties together.</p></div>
+    <div class="au-steps" role="group" aria-label="What your account does">
+      <button type="button" class="au-step current" data-au-step="0" aria-pressed="true"><span class="aus-ic" data-icon="search"></span><b>Track</b><small>Live repair status</small><span class="aus-bar"><i></i></span></button>
+      <button type="button" class="au-step" data-au-step="1" aria-pressed="false"><span class="aus-ic" data-icon="cart"></span><b>Rebook</b><small>Details filled in</small><span class="aus-bar"><i></i></span></button>
+      <button type="button" class="au-step" data-au-step="2" aria-pressed="false"><span class="aus-ic" data-icon="shield"></span><b>Warranty</b><small>Kept in one list</small><span class="aus-bar"><i></i></span></button>
+    </div>
   </aside>
-  <section class="au-main"><div class="au-box" id="authBox"></div><p class="au-foot"><span data-icon="lock"></span>Demo site. Accounts are saved in this browser only.</p></section>
+  <section class="au-main"><div class="au-box" id="authBox"></div><a href="index.html" class="au-mbrand" aria-label="Dhanmondi Mobile Care home"><span data-au-logo></span><span>Dhanmondi <em>Mobile Care</em></span></a><div class="au-foot"><a href="index.html" class="au-back"><span data-icon="left"></span>Back to website</a><span><span data-icon="lock"></span>Demo site. Data stays in this browser</span></div></section>
 </main>
 <script src="../js/icons.js?v=9"></script><script src="site-icons.js?v=2"></script><script src="../js/core.js?v=9"></script><script src="../js/ui.js?v=9"></script><script src="../js/domain.js?v=10"></script><script src="../js/shopcfg.js?v=5"></script><script src="../js/auth.js?v=9"></script>
-<script src="bridge.js?v=96"></script><script src="assistant.js?v=96"></script><script src="shop.js?v=96"></script><script src="account.js?v=96"></script><script src="layout.js?v=96"></script>
-<script>boot(() => SignIn.init());</script>
+<script src="bridge.js?v=96"></script><script src="assistant.js?v=96"></script><script src="shop.js?v=96"></script><script src="account.js?v=98"></script><script src="layout.js?v=96"></script>
+<script>boot(() => { document.querySelectorAll('[data-au-logo]').forEach(e => e.outerHTML = LOGO(32)); SignIn.init(); });</script>
 </body>
 </html>
