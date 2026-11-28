@@ -206,3 +206,28 @@ function listMount(cfg) {
   root.addEventListener('keydown', e => { if (e.key === 'Enter') { const tr = e.target.closest('tr[data-id]'); if (tr && e.target === tr && cfg.onRow) cfg.onRow(tr.dataset.id); } });
   draw(); cfg.redraw = draw; return draw;
 }
+
+/* ---------- Shared timeline (dashboard activity, job history) ---------- */
+function tlKind(text) {
+  const t = String(text || '');
+  if (/cancel|void|refund/i.test(t)) return ['x', 't-bad'];
+  if (/delivered|collected by|picked up/i.test(t)) return ['check', 't-ok'];
+  if (/ready for pickup/i.test(t)) return ['check', 't-ok'];
+  if (/advance|payment|paid|collected|৳|invoice|sale/i.test(t)) return ['wallet', 't-money'];
+  if (/quote|approv|estimate/i.test(t)) return ['file', ''];
+  if (/part|stock|purchase|supplier/i.test(t)) return ['package', 't-stock'];
+  if (/reminder|whatsapp|sms|notified|message/i.test(t)) return ['bell', ''];
+  if (/warranty|claim/i.test(t)) return ['shield', ''];
+  if (/assigned|technician/i.test(t)) return ['user', ''];
+  if (/note|condition|intake/i.test(t)) return ['edit', 't-set'];
+  if (/received|booked|new repair|created/i.test(t)) return ['wrench', ''];
+  if (/→|moved|status|diagnos|repair/i.test(t)) return ['arrow', ''];
+  if (/website|review/i.test(t)) return ['eye', 't-web'];
+  if (/settings|staff|updated/i.test(t)) return ['sliders', 't-set'];
+  return ['clock', 't-set'];
+}
+function timelineHtml(items, o = {}) {
+  if (!items.length) return `<p class="act-empty">${o.empty || 'Nothing yet'}</p>`;
+  return `<div class="act-tl${o.dense ? ' dense' : ''}">${items.map(a => { const k = a.icon ? [a.icon, a.tone || ''] : tlKind(a.text); const tag = a.ref ? 'button' : 'div';
+    return `<${tag} class="act-i"${a.ref ? ` type="button" data-actref="${esc(a.ref)}"` : ''}><span class="act-ic ${k[1]}">${ic(k[0], 15)}</span><span class="act-t"><b>${esc(String(a.text).replace(/ — /g, ': '))}</b><small>${a.meta}</small></span></${tag}>`; }).join('')}</div>`;
+}
