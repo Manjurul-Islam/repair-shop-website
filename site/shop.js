@@ -136,9 +136,18 @@ const Shop = {
 
   /* ---------- home: featured ---------- */
   featured() {
-    const el = $('#featGrid'); if (!el) return; const list = this.products('all').filter(p => p.id !== 'diag').slice(0, 4);
-    el.innerHTML = list.map(p => this.card(p)).join(''); $$('[data-dev-name]').forEach(e => e.textContent = this.dev.model);
-    $('#featDev').innerHTML = this.devPicker('fd');
+    const el = $('#featGrid'); if (!el) return; const list = this.products('all').filter(p => p.id !== 'diag');
+    el.innerHTML = list.map(p => this.card(p).replace('<article class="pcard', '<article role="listitem" class="pcard')).join(''); $$('[data-dev-name]').forEach(e => e.textContent = this.dev.model);
+    if (el._car) { el._car(); return; }
+    const dots = $('#featDots'), prev = $('[data-car="-1"]'), next = $('[data-car="1"]');
+    const step = () => { const c = el.querySelector('.pcard'); return c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap || 20) : el.clientWidth; };
+    const pages = () => Math.max(1, Math.round((el.scrollWidth - el.clientWidth) / step()) + 1);
+    const sync = () => { const max = el.scrollWidth - el.clientWidth - 2; prev.disabled = el.scrollLeft <= 2; next.disabled = el.scrollLeft >= max;
+      const n = pages(), i = Math.min(n - 1, Math.round(el.scrollLeft / step())); if (dots.children.length !== n) dots.innerHTML = '<i></i>'.repeat(n); [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i)); };
+    $$('[data-car]').forEach(b => b.addEventListener('click', () => el.scrollBy({ left: +b.dataset.car * step(), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })));
+    el.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); (e.key === 'ArrowRight' ? next : prev).click(); } });
+    let raf = 0; el.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(sync); }, { passive: true });
+    addEventListener('resize', sync); el._car = sync; requestAnimationFrame(sync);
   },
 
   /* ---------- catalog page ---------- */

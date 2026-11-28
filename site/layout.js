@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', () => titleCaseAll());
     d.dataset.st = open ? 'open' : 'closed'; clearTimeout(d._t); if (d._a) { d._a.cancel(); d._a = null; }
     if (reduce || !d.animate) { d.open = open; return; }
     const start = d.offsetHeight; d.open = true; const full = d.offsetHeight; const sh = d.querySelector('summary').offsetHeight + (d.offsetHeight - d.clientHeight);
-    d.style.overflow = 'hidden'; d._a = d.animate({ height: [start + 'px', (open ? full : sh) + 'px'] }, { duration: 300, easing: 'cubic-bezier(.22,1,.36,1)' });
+    d.style.overflow = 'hidden'; d._a = d.animate({ height: [start + 'px', (open ? full : sh) + 'px'] }, { duration: open ? 300 : 220, easing: open ? 'cubic-bezier(.22,1,.36,1)' : 'cubic-bezier(.4,0,.2,1)' });
     const done = () => { if (d.dataset.st !== (open ? 'open' : 'closed')) return; d.open = open; d.style.overflow = ''; if (d._a) { d._a.cancel(); d._a = null; } };
-    d._a.onfinish = done; d._t = setTimeout(done, 340);
+    d._a.onfinish = done; d._t = setTimeout(done, open ? 330 : 250);
   };
   document.addEventListener('click', e => {
     const sm = e.target.closest('details > summary'); if (!sm) return; const d = sm.parentElement; if (d.classList.contains('cs-d')) return;

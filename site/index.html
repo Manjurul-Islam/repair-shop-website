@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=40"><link rel="stylesheet" href="pages.css?v=40"><link rel="stylesheet" href="lower.css?v=46">
-<link rel="stylesheet" href="nx.css?v=77">
+<link rel="stylesheet" href="nx.css?v=82">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap">
 </head>
 <body data-page="home">
@@ -145,11 +145,13 @@
 <!-- ================= POPULAR (product cards) ================= -->
 <section class="nx nx-pop" id="popular">
   <div class="wrap">
-    <div class="nx-split"><div><p class="nx-k">Most booked</p><h2>Popular repairs for your <em data-dev-name>iPhone 13</em></h2></div><div id="featDev"></div></div>
-    <div class="p-grid four" id="featGrid"></div>
-    <div class="nx-more"><a class="s-btn" href="repairs.html">See all repairs & prices<span data-icon="right"></span></a></div>
+    <div class="nx-split"><div><p class="nx-k">Most booked</p><h2>Popular repairs for your <em data-dev-name>iPhone 13</em></h2></div>
+      <div class="car-nav"><button type="button" class="car-b" data-car="-1" aria-label="Previous repairs" aria-controls="featGrid"><span data-icon="left"></span></button><button type="button" class="car-b" data-car="1" aria-label="Next repairs" aria-controls="featGrid"><span data-icon="right"></span></button></div></div>
+    <div class="car" id="featCar"><div class="car-track" id="featGrid" role="list" aria-label="Most booked repairs" tabindex="0"></div></div>
+    <div class="car-foot"><div class="car-dots" id="featDots" aria-hidden="true"></div><a class="s-btn" href="repairs.html">See all repairs & prices<span data-icon="right"></span></a></div>
   </div>
 </section>
+
 
 <!-- ================= TRUST (9 consistent cards, duotone icons) ================= -->
 <section class="nx nx-prom">
@@ -221,6 +223,6 @@
 <footer class="foot" id="foot"></footer>
 
 <script src="../js/icons.js?v=9"></script><script src="site-icons.js?v=2"></script><script src="../js/core.js?v=9"></script><script src="../js/ui.js?v=9"></script><script src="../js/domain.js?v=10"></script><script src="../js/shopcfg.js?v=5"></script><script src="../js/auth.js?v=9"></script>
-<script src="bridge.js?v=96"></script><script src="assistant.js?v=96"></script><script src="shop.js?v=102"></script><script src="account.js?v=98"></script><script src="layout.js?v=101"></script><script src="guides.js?v=96"></script><script src="home.js?v=96"></script>
+<script src="bridge.js?v=96"></script><script src="assistant.js?v=96"></script><script src="shop.js?v=110"></script><script src="account.js?v=98"></script><script src="layout.js?v=110"></script><script src="guides.js?v=96"></script><script src="home.js?v=96"></script>
 </body>
 </html>
