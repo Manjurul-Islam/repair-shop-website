@@ -66,7 +66,7 @@ function createJob(d) {
   logJob(j, 'Repair job received' + (d.isWarranty ? ' (warranty claim)' : ''), d.ts);
   DB.jobs.push(j);
   if (+d.advance > 0) { addPayment({ amount: d.advance, method: d.method || 'Cash', jobId: j.id, note: 'Advance payment', date: d.date, branch: j.branch }); logJob(j, `Advance of ${money(d.advance)} collected`, d.ts); }
-  logAct(`New repair ${j.code} — ${j.brand} ${j.model} for ${custName(custId)}`, 'jobs/' + j.code, d.ts);
+  logAct(`New repair ${j.code}: ${j.brand} ${j.model} for ${custName(custId)}`, 'jobs/' + j.code, d.ts);
   return j;
 }
 function addJobPart(j, item, qty) {
@@ -96,7 +96,7 @@ function deliverJob(j, { date, pay = 0, method = 'Cash', warrantyDays = 0 }) {
   DB.payments.filter(p => p.jobId === j.id && !p.invoiceId).forEach(p => p.invoiceId = inv.id);
   if (pay > 0) addPayment({ amount: pay, method, invoiceId: inv.id, jobId: j.id, date, note: 'Payment on delivery', branch: j.branch });
   j.status = 'delivered'; j.deliveredAt = date; logJob(j, `Delivered to customer · invoice ${inv.code}`, parseD(date).getTime() + 15 * 3600e3);
-  logAct(`${j.code} delivered — ${inv.code} ${money(inv.amount)}`, 'jobs/' + j.code, parseD(date).getTime() + 15 * 3600e3);
+  logAct(`${j.code} delivered: ${inv.code} ${money(inv.amount)}`, 'jobs/' + j.code, parseD(date).getTime() + 15 * 3600e3);
   if (warrantyDays > 0) {
     const w = { id: uid('w'), code: warCode(), kind: 'repair', jobId: j.id, saleId: null, custId: j.custId, title: `${j.brand} ${j.model}`, covers: j.parts.length ? j.parts.map(p => p.name).join(', ') : 'Repair labor', start: date, days: warrantyDays, expires: addDays(date, warrantyDays), claims: [], voided: false };
     DB.warranties.push(w);
@@ -124,7 +124,7 @@ function createSale({ lines, custId, discount = 0, method = 'Cash', received, br
   DB.invoices.push(inv); sale.invoiceId = inv.id;
   const pay = Math.min(received ?? total, total); if (pay > 0) addPayment({ amount: pay, method, invoiceId: inv.id, date, note: 'POS sale', branch: sale.branch });
   lines.forEach(l => { const it = l.itemId && itemOf(l.itemId); if (it && it.warrantyDays > 0) DB.warranties.push({ id: uid('w'), code: warCode(), kind: 'product', jobId: null, saleId: sale.id, custId: sale.custId, title: it.name, covers: 'Manufacturing defects', start: date, days: it.warrantyDays, expires: addDays(date, it.warrantyDays), claims: [], voided: false }); });
-  logAct(`Sale ${sale.code} — ${money(total)}`, 'invoices/' + inv.code, sale.ts);
+  logAct(`Sale ${sale.code}: ${money(total)}`, 'invoices/' + inv.code, sale.ts);
   return { sale, inv };
 }
 
