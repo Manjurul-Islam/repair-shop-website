@@ -164,7 +164,9 @@ const Shop = {
     const F = this.f = this.f || {}, add = this.cat === 'addons'; if (!$('#fPrice')) return;
     const PR = [['', 'Any'], ['0-1000', 'Under ৳1,000'], ['1000-3000', '৳1,000 – 3,000'], ['3000-8000', '৳3,000 – 8,000'], ['8000-', '৳8,000+']];
     $('#fPrice').innerHTML = PR.map(([v, l]) => `<button type="button" role="radio" aria-checked="${(F.price || '') === v}" data-fprice="${v}">${l}</button>`).join('');
-    $('#fRate').innerHTML = [0, 4.5, 4].map(r => `<button type="button" role="radio" aria-checked="${(F.rate || 0) === r}" data-frate="${r}">${r ? `<span class="rl-st">${'★'.repeat(Math.floor(r))}${r % 1 ? '½' : ''}</span>${r}+` : 'Any rating'}</button>`).join('');
+    const rated = SERVICES.filter(x => META[x.id] && META[x.id].n), rn = r => r ? rated.filter(x => META[x.id].rating >= r).length : SERVICES.length;
+    const stars = r => `<span class="rl-st" aria-hidden="true"><i>★★★★★</i><b style="width:${r / 5 * 100}%">★★★★★</b></span>`;
+    $('#fRate').innerHTML = [0, 4.5, 4].map(r => `<button type="button" role="radio" aria-checked="${(F.rate || 0) === r}" data-frate="${r}" ${r && !rn(r) ? 'disabled' : ''}><span class="rl-r" aria-hidden="true"></span>${r ? `${stars(r)}<span class="rl-t">${r} & up</span>` : '<span class="rl-t">Any rating</span>'}<span class="rl-n">${rn(r)}</span></button>`).join('');
     $('#fSame').checked = !!F.same; $('#fStock').checked = !!F.stock;
     $$('.plp-side .ps-box').forEach((b, i) => { if (i > 1) b.classList.toggle('off', add); });
     const chips = []; if (F.price) chips.push(['price', PR.find(p => p[0] === F.price)[1]]); if (F.same) chips.push(['same', 'Same day']); if (F.stock) chips.push(['stock', 'In stock']); if (F.rate) chips.push(['rate', F.rate + '★ & up']);

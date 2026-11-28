@@ -136,3 +136,23 @@ const tcWord = w => { const i = w.search(/[A-Za-z]/); if (i < 0) return w; const
 function titleCaseAll(root = document) { $$(TC_SEL, root.nodeType === 1 ? root.ownerDocument : document).forEach(el => { const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n; while ((n = tw.nextNode())) { const t = n.nodeValue.replace(/\S+/g, tcWord); if (t !== n.nodeValue) n.nodeValue = t; } }); }
 let __tcRaf = 0; new MutationObserver(() => { cancelAnimationFrame(__tcRaf); __tcRaf = requestAnimationFrame(() => titleCaseAll()); }).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
 document.addEventListener('DOMContentLoaded', () => titleCaseAll());
+
+/* FAQ accordions: one open at a time, smooth height animation, same behaviour site-wide */
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const want = d => d.dataset.st ? d.dataset.st === 'open' : d.open;
+  const set = (d, open) => {
+    d.dataset.st = open ? 'open' : 'closed'; clearTimeout(d._t); if (d._a) { d._a.cancel(); d._a = null; }
+    if (reduce || !d.animate) { d.open = open; return; }
+    const start = d.offsetHeight; d.open = true; const full = d.offsetHeight; const sh = d.querySelector('summary').offsetHeight + (d.offsetHeight - d.clientHeight);
+    d.style.overflow = 'hidden'; d._a = d.animate({ height: [start + 'px', (open ? full : sh) + 'px'] }, { duration: 300, easing: 'cubic-bezier(.22,1,.36,1)' });
+    const done = () => { if (d.dataset.st !== (open ? 'open' : 'closed')) return; d.open = open; d.style.overflow = ''; if (d._a) { d._a.cancel(); d._a = null; } };
+    d._a.onfinish = done; d._t = setTimeout(done, 340);
+  };
+  document.addEventListener('click', e => {
+    const sm = e.target.closest('details > summary'); if (!sm) return; const d = sm.parentElement; if (d.classList.contains('cs-d')) return;
+    e.preventDefault(); const open = !want(d);
+    if (open) [...d.parentElement.children].forEach(x => { if (x !== d && x.tagName === 'DETAILS' && want(x)) set(x, false); });
+    set(d, open);
+  });
+})();
