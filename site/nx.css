@@ -1363,3 +1363,14 @@ html.bk-lock{overflow:hidden}
   .ck-items li>.l-art{grid-area:a}.ck-items li>div{grid-area:t;min-width:0}
   .ck-items li>span:not(.l-art){grid-area:p;font-weight:600}.ck-items li>.rm{grid-area:r;justify-self:end}
 }
+
+/* Hero pill arrow: equal space both sides, optically centred on the text */
+.announce>[data-icon]{width:18px!important;height:18px!important;margin-left:-5px!important;margin-right:0!important;transform:translateY(-.5px)}
+.announce>[data-icon] .ic{width:18px!important;height:18px!important}
+.hero .announce,.announce{padding-right:4px!important}
+/* Most Booked dots: smaller, circular active state */
+.car-dots{gap:8px!important;align-items:center}
+.car-dots i{width:7px!important;height:7px!important;border-radius:50%!important;flex:none;transition:background .25s,transform .25s!important}
+.car-dots i.on{width:7px!important;background:var(--blue)!important;transform:scale(1.3)}
+.announce>[data-icon]{margin-left:-6px!important}
+@media (max-width:374px){.announce>[data-icon]{margin-left:-4px!important}}
